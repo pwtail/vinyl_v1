@@ -1,0 +1,49 @@
+{
+    "_meta": {
+        "hash": {
+            "sha256": "3699a1dcc308d534613f4b4a5bcb3e626a6c4d7b42a3d4d67985da6bd2b66d6c"
+        },
+        "pipfile-spec": 6,
+        "requires": {
+            "python_version": "3.10"
+        },
+        "sources": [
+            {
+                "name": "pypi",
+                "url": "https://pypi.org/simple",
+                "verify_ssl": true
+            }
+        ]
+    },
+    "default": {
+        "asgiref": {
+            "hashes": [
+                "sha256:1d2880b792ae8757289136f1db2b7b99100ce959b2aa57fd69dab783d05afac4",
+                "sha256:4a29362a6acebe09bf1d6640db38c1dc3d9217c68e6f9f6204d72667fc19a424"
+            ],
+            "markers": "python_version >= '3.7'",
+            "version": "==3.5.2"
+        },
+        "django": {
+            "editable": true,
+            "path": "/home/pwtail/sof/godjan"
+        },
+        "psycopg": {
+            "hashes": [
+                "sha256:0f5e18920ed978f5063e48acc5ca4389225db7d06a03090d2bbb7a0ec7a640b2",
+                "sha256:44ca63373c33957ca852fefa1940f8cc5d4c11493b7f6710b0ab250ff5abc50c"
+            ],
+            "index": "pypi",
+            "version": "==3.0.16"
+        },
+        "sqlparse": {
+            "hashes": [
+                "sha256:0c00730c74263a94e5a9919ade150dfc3b19c574389985446148402998287dae",
+                "sha256:48719e356bb8b42991bdbb1e8b83223757b93789c00910a616a071910ca4a64d"
+            ],
+            "markers": "python_version >= '3.5'",
+            "version": "==0.4.2"
+        }
+    },
+    "develop": {}
+}
