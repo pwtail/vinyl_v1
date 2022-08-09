@@ -5,6 +5,8 @@ from django.db.models.utils import resolve_callables
 
 from vinyl.queryset import VinylQuerySet
 
+def make_vinyl_model(model):
+    return model
 
 class _VinylManager(BaseManager.from_queryset(VinylQuerySet)):
     """

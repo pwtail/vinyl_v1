@@ -27,8 +27,10 @@ class ExecuteMixin:
                 return iter([])
             else:
                 return None
+        #TODO use pool
         async with await psycopg.AsyncConnection.connect(
-                "dbname=test user=postgres") as aconn:
+                "dbname=lulka user=postgres"
+        ) as aconn:
             async with aconn.cursor() as cursor:
                 await cursor.execute(sql, params)
                 if result_type == SINGLE:
