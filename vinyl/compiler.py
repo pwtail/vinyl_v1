@@ -10,9 +10,12 @@ from vinyl.tlocal import tlocal
 
 class ExecuteMixin:
 
-    def execute_sql(self, result_type=MULTI):
+    def execute_sql(self, result_type=MULTI, **kw):
         if tl := getattr(tlocal, 'await_queryset', None):
             return tl['execute_sql']
+        if tl := getattr(tlocal, 'deferred', None):
+            sql, params = self.as_sql()
+            tl.setdefault('ops', []).append((sql, params))
         return super().execute_sql(result_type=result_type)
 
     async def async_execute_sql(self, result_type=MULTI):
@@ -28,6 +31,7 @@ class ExecuteMixin:
             else:
                 return None
         #TODO use pool
+        import psycopg
         async with await psycopg.AsyncConnection.connect(
                 "dbname=lulka user=postgres"
         ) as aconn:
@@ -39,7 +43,8 @@ class ExecuteMixin:
                         return val[0:self.col_count]
                     return val
                 elif result_type == MULTI:
-                    return await cursor.fetchall()
+                    results = await cursor.fetchall()
+                    return (results,)
                 elif result_type == CURSOR:
                     return RetCursor(cursor.rowcount, getattr(cursor, 'lastrowid', None))
 
@@ -56,30 +61,7 @@ class SQLCompiler(ExecuteMixin, _compiler.SQLCompiler):
         """Return an iterator over the results from executing this query."""
         assert results is not None
         #TODO or tl
-        return ...
-
-    def convert_rows(self, rows, tuple_expected=False):
-        "Apply converters."
-        fields = [s[0] for s in self.select[0 : self.col_count]]
-        converters = self.get_converters(fields)
-        if converters:
-            rows = self.apply_converters(rows, converters)
-            if tuple_expected:
-                rows = map(tuple, rows)
-        return rows
-
-    def has_results(self):
-        """
-        Backends (e.g. NoSQL) can override this in order to use optimized
-        versions of "query has any results."
-        """
-        result = self.execute_sql(SINGLE)
-
-        @later
-        def ret(result=result):
-            return bool(result)
-        return ret()
-
+        return super().results_iter(results=results, tuple_expected=tuple_expected)
 
 
 class RetCursor(typing.NamedTuple):

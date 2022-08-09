@@ -23,6 +23,13 @@ class VinylQuerySet(QuerySet):
             self._fetch_all()
         return self._result_cache
 
+    @property
+    def db(self):
+        db = super().db
+        if db.startswith('vinyl_'):
+            return db
+        return f'vinyl_{db}'
+
 
 class VinylQuery(Query):
 
