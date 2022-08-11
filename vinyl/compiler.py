@@ -12,10 +12,16 @@ class ExecuteMixin:
 
     def execute_sql(self, result_type=MULTI, **kw):
         if tl := getattr(tlocal, 'await_queryset', None):
+        # if task := getattr(tlocal, 'task') and 1:
+        #     match task:
+        #         EvalQs(qs):
+        #             1
             return tl['execute_sql']
         if tl := getattr(tlocal, 'deferred', None):
             sql, params = self.as_sql()
             tl.setdefault('ops', []).append((sql, params))
+            return
+        assert False
         return super().execute_sql(result_type=result_type)
 
     async def async_execute_sql(self, result_type=MULTI):
@@ -50,18 +56,20 @@ class ExecuteMixin:
 
 
 class SQLCompiler(ExecuteMixin, _compiler.SQLCompiler):
-
-    def results_iter(
-        self,
-        results=None,
-        tuple_expected=False,
-        chunked_fetch=False,
-        chunk_size=GET_ITERATOR_CHUNK_SIZE,
-    ):
-        """Return an iterator over the results from executing this query."""
-        assert results is not None
-        #TODO or tl
-        return super().results_iter(results=results, tuple_expected=tuple_expected)
+    #
+    # def results_iter(
+    #     self,
+    #     results=None,
+    #     tuple_expected=False,
+    #     chunked_fetch=False,
+    #     chunk_size=GET_ITERATOR_CHUNK_SIZE,
+    # ):
+    #     """Return an iterator over the results from executing this query."""
+    #     assert results is not None
+    #     #TODO or tl
+    #     return super().results_iter(results=results, tuple_expected=tuple_expected)
+    #
+    1
 
 
 class RetCursor(typing.NamedTuple):
@@ -80,3 +88,8 @@ class RetCursor(typing.NamedTuple):
     def close(self):
         pass
 
+
+
+class SQLUpdateCompiler(ExecuteMixin, _compiler.SQLUpdateCompiler):
+
+    1

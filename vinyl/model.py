@@ -1,9 +1,11 @@
 
 # .connect(toppings_changed, sender=Pizza.toppings.through)
 
-from django.db.models import DEFERRED
+from django.db.models import DEFERRED, Model
+from django.db.models.base import ModelBase
 
 from vinyl.queryset import VinylQuerySet
+from vinyl.tlocal import tlocal_context
 
 
 class ModelMixin:
@@ -39,7 +41,14 @@ class VinylMetaD:
         return owner._model._meta
 
 
-class VinylModel(ModelMixin):
+class SkipModelBase(ModelBase):
+    """Metaclass for all models."""
+
+    def __new__(cls, name, bases, attrs, **kwargs):
+        return type.__new__(cls, name, bases, attrs)
+
+
+class VinylModel(Model, metaclass=SkipModelBase):
     _model = None
     _meta = VinylMetaD()
 
@@ -49,3 +58,23 @@ class VinylModel(ModelMixin):
         ob._prefetch_cache = {}
         ob.__class__ = cls
         return ob
+
+    async def save(
+            self, force_insert=False, force_update=False, using=None, update_fields=None
+    ):
+        with tlocal_context('deferred') as tl:
+            tl[1] = 1
+            super().save(force_update=True, using=using, update_fields=update_fields)
+
+            print(tl['ops'])
+
+    def _do_update(self, base_qs, using, pk_val, values, update_fields, forced_update):
+        """
+        Try to update the model. Return True if the model was updated (if an
+        update query was done and a matching row was found in the DB).
+        """
+        filtered = base_qs.filter(pk=pk_val)
+        if not values:
+            return True
+        filtered._update(values)
+        return True
