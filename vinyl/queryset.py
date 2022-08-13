@@ -1,12 +1,15 @@
+from contextlib import contextmanager
+
 from django.db.models import QuerySet
 from django.db.models.sql import Query
 
+from vinyl.pre_evaluation import pre_evaluate, QuerySetResult
 from vinyl.prefetch import prefetch_related_objects
-from vinyl.tlocal import tlocal_context, tlocal
 
 
 class VinylQuerySet(QuerySet):
 
+    #TODO ?
     @classmethod
     def clone(cls, qs):
         c = cls(
@@ -34,9 +37,7 @@ class VinylQuerySet(QuerySet):
         db = self.db
         compiler = self.query.get_compiler(using=db)
         results = await compiler.async_execute_sql()
-        with tlocal_context('await_queryset') as tl:
-            tl['compiler'] = compiler
-            tl['execute_sql'] = results
+        with pre_evaluate(queryset=self, compiler=compiler, results=results):
             self._fetch_all()
         if self._prefetch_related_lookups and not self._prefetch_done:
             await self._prefetch_related_objects()
@@ -62,6 +63,7 @@ class VinylQuerySet(QuerySet):
 class VinylQuery(Query):
 
     def get_compiler(self, using=None, connection=None, elide_empty=True):
-        if tl := getattr(tlocal, 'await_queryset', None):
-            return tl['compiler']
+        if result := QuerySetResult.get():
+            assert result.qs.query is self
+            return result.compiler
         return super().get_compiler(using=using, connection=connection, elide_empty=elide_empty)

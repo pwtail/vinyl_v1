@@ -5,18 +5,14 @@ from django.db.models.sql import compiler as _compiler
 
 from django.db.models.sql.compiler import *
 
-from vinyl.tlocal import tlocal
+from vinyl.pre_evaluation import QuerySetResult
 
 
 class ExecuteMixin:
 
     def execute_sql(self, result_type=MULTI, **kw):
-        if tl := getattr(tlocal, 'await_queryset', None):
-        # if task := getattr(tlocal, 'task') and 1:
-        #     match task:
-        #         EvalQs(qs):
-        #             1
-            return tl['execute_sql']
+        if result := QuerySetResult.get():
+            return result.results
         if tl := getattr(tlocal, 'deferred', None):
             sql, params = self.as_sql()
             tl.setdefault('ops', []).append((sql, params))

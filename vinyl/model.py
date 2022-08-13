@@ -5,7 +5,6 @@ from django.db.models import DEFERRED, Model
 from django.db.models.base import ModelBase
 
 from vinyl.queryset import VinylQuerySet
-from vinyl.tlocal import tlocal_context
 
 
 class ModelMixin:
