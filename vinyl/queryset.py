@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Model
 from django.db.models.sql import Query
 
 from vinyl.pre_evaluation import pre_evaluate, QuerySetResult
@@ -9,12 +9,12 @@ from vinyl.prefetch import prefetch_related_objects
 
 class VinylQuerySet(QuerySet):
 
-    #TODO ?
     @classmethod
     def clone(cls, qs):
+        query = VinylQuery.convert(qs.query)
         c = cls(
-            model=qs.model,
-            query=qs.query.chain(klass=VinylQuery),
+            model=query.model,
+            query=query,
             using=qs._db,
             hints=qs._hints,
         )
@@ -27,8 +27,16 @@ class VinylQuerySet(QuerySet):
         return c
 
     def __init__(self, model=None, query=None, using=None, hints=None):
+        assert model
+
+        # query = VinylQuery.convert(query)
+        from vinyl.model import VinylModel
+        if not issubclass(model, VinylModel):
+            assert issubclass(model, Model)
+            model = model.vinyl_model
         query = query or VinylQuery(model)
         super().__init__(model=model, query=query, using=using, hints=hints)
+
 
     def __await__(self):
         return self._await().__await__()
@@ -61,6 +69,17 @@ class VinylQuerySet(QuerySet):
 
 
 class VinylQuery(Query):
+
+    @classmethod
+    def convert(cls, query):
+        if isinstance(query, VinylQuery):
+            return query
+        query = query.chain(klass=cls)
+        from vinyl.model import VinylModel
+        if not issubclass(query.model, VinylModel):
+            assert issubclass(query.model, Model)
+            query.model = query.model.vinyl_model
+        return query
 
     def get_compiler(self, using=None, connection=None, elide_empty=True):
         if result := QuerySetResult.get():

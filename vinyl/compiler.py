@@ -67,6 +67,12 @@ class SQLCompiler(ExecuteMixin, _compiler.SQLCompiler):
     #
     1
 
+class DeferredCompilerMixin:
+    def execute_sql(self, result_type, **kw):
+        print(result_type)
+        # async ctx mgr
+        ct = get_ctx()
+
 
 class RetCursor(typing.NamedTuple):
     """
@@ -86,6 +92,7 @@ class RetCursor(typing.NamedTuple):
 
 
 
-class SQLUpdateCompiler(ExecuteMixin, _compiler.SQLUpdateCompiler):
+class SQLUpdateCompiler(DeferredCompilerMixin, _compiler.SQLUpdateCompiler):
 
-    1
+    def execute_sql(self, result_type=MULTI, **kw):
+        1
