@@ -42,7 +42,7 @@ def make_vinyl_model(model):
     if hasattr(model, 'vinyl_model'):
         return model.vinyl_model
     ns = copy_namespace(model)
-    bases = (VinylModel,)
+    bases = (VinylModel, model)
     newcls = model.vinyl_model = type(model.__name__, bases, ns)
     newcls._model = model
     return newcls

@@ -97,5 +97,9 @@ class SQLUpdateCompiler(DeferredCompilerMixin, _compiler.SQLUpdateCompiler):
     pass
 
 
-class SQLInsertCompiler(DeferredCompilerMixin, _compiler.SQLInsertCompiler):
-    pass
+class SQLInsertCompiler(_compiler.SQLInsertCompiler):
+
+    def execute_sql(self, result_type, **kw):
+        # print(result_type)
+        for sql, params in self.as_sql():
+            add_statement(sql, params)
