@@ -5,6 +5,7 @@ from django.db.models.sql import compiler as _compiler
 
 from django.db.models.sql.compiler import *
 
+from vinyl.deferred import add_statement
 from vinyl.pre_evaluation import QuerySetResult
 
 
@@ -69,9 +70,9 @@ class SQLCompiler(ExecuteMixin, _compiler.SQLCompiler):
 
 class DeferredCompilerMixin:
     def execute_sql(self, result_type, **kw):
-        print(result_type)
-        # async ctx mgr
-        ct = get_ctx()
+        # print(result_type)
+        sql, params = self.as_sql()
+        add_statement(sql, params)
 
 
 class RetCursor(typing.NamedTuple):
@@ -93,6 +94,8 @@ class RetCursor(typing.NamedTuple):
 
 
 class SQLUpdateCompiler(DeferredCompilerMixin, _compiler.SQLUpdateCompiler):
+    pass
 
-    def execute_sql(self, result_type=MULTI, **kw):
-        1
+
+class SQLInsertCompiler(DeferredCompilerMixin, _compiler.SQLInsertCompiler):
+    pass

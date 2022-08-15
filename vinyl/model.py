@@ -4,6 +4,7 @@
 from django.db.models import DEFERRED, Model
 from django.db.models.base import ModelBase
 
+from vinyl import deferred
 from vinyl.queryset import VinylQuerySet
 
 
@@ -61,11 +62,9 @@ class VinylModel(Model, metaclass=SkipModelBase):
     async def save(
             self, force_insert=False, force_update=False, using=None, update_fields=None
     ):
-        with tlocal_context('deferred') as tl:
-            tl[1] = 1
+        async with deferred.driver():
             super().save(force_update=True, using=using, update_fields=update_fields)
 
-            print(tl['ops'])
 
     def _do_update(self, base_qs, using, pk_val, values, update_fields, forced_update):
         """
