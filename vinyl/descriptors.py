@@ -1,7 +1,24 @@
 from vinyl import deferred
 
+class FKDescriptor:
+    def __set_name__(self, owner, name):
+        self.name = name
 
-class ManyToManyDescriptor:
+    # def __get__(self, instance, owner):
+    #     1
+
+    def __get__(self, instance, owner):
+        django_model = owner._model
+        attr = getattr(django_model, self.name)
+        qs = attr.get_queryset(instance=instance)
+        from vinyl.queryset import VinylQuerySet
+        qs = VinylQuerySet.clone(qs)
+        # Assuming the database enforces foreign keys, this won't fail.
+        return qs.filter(attr.field.get_reverse_related_filter(instance)).get_or_none()
+
+
+
+class RelatedManagerDescriptor:
 
     def __get__(self, instance, owner):
         django_model = owner._model
@@ -10,7 +27,7 @@ class ManyToManyDescriptor:
         # manager.__class__ = wrap_related_manager(manager.__class__)
         if wrapper := getattr(manager, 'vinyl_wrapper', None):
             return wrapper
-        manager.vinyl_wrapper = Wrapper(manager)
+        manager.vinyl_wrapper = RelatedManagerWrapper(manager)
         return manager.vinyl_wrapper
 
 
@@ -18,7 +35,7 @@ class ManyToManyDescriptor:
         self.name = name
 
 
-class Wrapper:
+class RelatedManagerWrapper:
     def __init__(self, manager):
         self.rel_mgr = manager
 

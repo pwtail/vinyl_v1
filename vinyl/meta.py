@@ -29,11 +29,13 @@ def copy_namespace(model):
     model_vars.update(vars(model))
     for key, val in model_vars.items():
         if hasattr(val, 'field') and val.__module__ == 'django.db.models.fields.related_descriptors':
-            if val.__class__.__name__ == 'ManyToManyDescriptor':
-                print('m2m', key)
-                from vinyl.descriptors import ManyToManyDescriptor
-                val = ManyToManyDescriptor()
-            ns[key] = val  # TODO modify
+            if hasattr(val, 'related_manager_cls'):
+                from vinyl.descriptors import RelatedManagerDescriptor
+                val = RelatedManagerDescriptor()
+            else:
+                from vinyl.descriptors import FKDescriptor
+                val = FKDescriptor()
+            ns[key] = val
     return ns
 
 
