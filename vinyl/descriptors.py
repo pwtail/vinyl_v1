@@ -10,6 +10,8 @@ class FKDescriptor:
     def __get__(self, instance, owner):
         django_model = owner._model
         attr = getattr(django_model, self.name)
+        if instance is None:
+            return attr.__get__(None, django_model)
         qs = attr.get_queryset(instance=instance)
         from vinyl.queryset import VinylQuerySet
         qs = VinylQuerySet.clone(qs)
@@ -22,8 +24,10 @@ class RelatedManagerDescriptor:
 
     def __get__(self, instance, owner):
         django_model = owner._model
-        wrapped = getattr(django_model, self.name)
-        manager = wrapped.__get__(instance, owner)
+        attr = getattr(django_model, self.name)
+        if instance is None:
+            return attr.__get__(None, django_model)
+        manager = attr.__get__(instance, owner)
         # manager.__class__ = wrap_related_manager(manager.__class__)
         if wrapper := getattr(manager, 'vinyl_wrapper', None):
             return wrapper

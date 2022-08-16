@@ -59,6 +59,10 @@ class VinylModel(Model, metaclass=SkipModelBase):
         ob.__class__ = cls
         return ob
 
+    def __getitem__(self, item):
+        1
+        # TODO prefetch_objects_cache ?
+
     async def save(
             self, force_insert=False, force_update=False, using=None, update_fields=None
     ):

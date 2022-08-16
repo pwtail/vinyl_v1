@@ -196,7 +196,7 @@ def get_prefetcher(instance, through_attr, to_attr):
                 # descriptor doesn't support prefetching, so we go ahead and get
                 # the attribute on the instance rather than the class to
                 # support many related managers
-                rel_obj = getattr(instance, through_attr)
+                rel_obj = getattr(instance, through_attr).rel_mgr
                 if hasattr(rel_obj, "get_prefetch_queryset"):
                     prefetcher = rel_obj
                 if through_attr != to_attr:
@@ -315,7 +315,7 @@ async def prefetch_one_level(instances, prefetcher, lookup, level):
             if as_attr:
                 setattr(obj, to_attr, vals)
             else:
-                manager = getattr(obj, to_attr)
+                manager = getattr(obj, to_attr).rel_mgr
                 if leaf and lookup.queryset is not None:
                     qs = manager._apply_rel_filters(lookup.queryset)
                 else:
