@@ -16,13 +16,24 @@ class ManyToManyDescriptor:
 
     def __set_name__(self, owner, name):
         self.name = name
-        print('name', name)
 
 
 class Wrapper:
     def __init__(self, manager):
-        self.manager = manager
+        self.rel_mgr = manager
 
-    async def add(self, *objs):
+    async def add(self, *args, **kw):
         async with deferred.driver():
-            self.manager.add(*objs)
+            self.rel_mgr.add(*args, **kw)
+
+    async def set(self, *args, **kw):
+        async with deferred.driver():
+            self.rel_mgr.set(*args, **kw)
+
+    async def remove(self, *args, **kw):
+        async with deferred.driver():
+            self.rel_mgr.remove(*args, **kw)
+
+    async def clear(self, *args, **kw):
+        async with deferred.driver():
+            self.rel_mgr.clear(*args, **kw)
