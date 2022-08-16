@@ -6,14 +6,24 @@ from django.db.models.sql import compiler as _compiler
 from django.db.models.sql.compiler import *
 
 from vinyl.deferred import add_statement
-from vinyl.pre_evaluation import QuerySetResult
+from vinyl.pre_evaluation import QueryResult
 
 
 class ExecuteMixin:
 
+    def __await__(self):
+        return self._await().__await__()
+
+    async def _await(self):
+        results = await self.async_execute_sql()
+        self.query.pre_evaluated = QueryResult(compiler=self, results=results)
+        return results
+
     def execute_sql(self, result_type=MULTI, **kw):
-        if result := QuerySetResult.get():
-            return result.results
+        if pre := self.query.pre_evaluated:
+            assert pre.compiler is self
+            return pre.results
+            # TODO del for assertion
         if tl := getattr(tlocal, 'deferred', None):
             sql, params = self.as_sql()
             tl.setdefault('ops', []).append((sql, params))
