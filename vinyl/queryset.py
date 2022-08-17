@@ -97,6 +97,9 @@ class VinylQuerySet(QuerySet):
         await prefetch_related_objects(self._result_cache, *self._prefetch_related_lookups)
         self._prefetch_done = True
 
+    def prefetch(self, *args, **kw):
+        return self.prefetch_related(*args, **kw)
+
     @property
     def db(self):
         db = super().db
