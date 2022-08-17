@@ -60,8 +60,9 @@ class VinylModel(Model, metaclass=SkipModelBase):
         return ob
 
     def __getitem__(self, item):
-        return self._prefetched_objects_cache[item]
-        # TODO Fk
+        if value := self._prefetched_objects_cache.get(item) is not None:
+            return value
+        return self._state.fields_cache[item]
 
     async def save(
             self, force_insert=False, force_update=False, using=None, update_fields=None
