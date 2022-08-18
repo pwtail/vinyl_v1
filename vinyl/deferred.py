@@ -1,37 +1,35 @@
 import threading
 from collections import deque
 from contextlib import asynccontextmanager
+from contextvars import ContextVar
 
-tlocal = threading.local()
-tlocal.statements = None
+statements = ContextVar('statements')
 
 def add_statement(*stmt):
-    tlocal.statements.append(stmt)
-#
-# async with driver():
-#   set contextvar
+    statements.get().append(stmt)
+
 
 @asynccontextmanager
 async def driver():
-    assert not tlocal.statements
-    tlocal.statements = deque()
+    token = statements.set(value := deque())
     try:
-        yield tlocal.statements
-        await execute_statements()
+        yield value
+        await execute_statements(value)
     finally:
-        if tlocal.statements:
+        if value:
             print('not all statements did execute')
+        statements.reset(token)
 
 
 # transaction?
-async def execute_statements():
+async def execute_statements(statements):
     # TODO use pool
     import psycopg
     async with await psycopg.AsyncConnection.connect(
             "dbname=lulka user=postgres"
     ) as aconn:
-        while tlocal.statements:
-            sql, params = tlocal.statements.popleft()
+        while statements:
+            sql, params = statements.popleft()
             async with aconn.cursor() as cursor:
                 print(sql, params)
                 await cursor.execute(sql, params)

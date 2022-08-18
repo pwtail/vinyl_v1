@@ -110,6 +110,7 @@ class SQLUpdateCompiler(DeferredCompilerMixin, _compiler.SQLUpdateCompiler):
 class SQLInsertCompiler(_compiler.SQLInsertCompiler):
 
     def execute_sql(self, result_type, **kw):
-        # print(result_type)
         for sql, params in self.as_sql():
             add_statement(sql, params)
+import psycopg2
+psycopg2
