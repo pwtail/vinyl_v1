@@ -37,14 +37,6 @@ class SaveMixin:
         # Once saved, this is no longer a to-be-added instance.
         self._state.adding = False
 
-    async def save(
-            self, using=None, update_fields=None
-    ):
-        """
-        Always do an update
-        """
-        async with deferred.driver():
-            super().save(force_update=True, using=using, update_fields=update_fields)
 
     def _do_update(self, base_qs, using, pk_val, values, update_fields, forced_update):
         """

@@ -62,3 +62,14 @@ class VinylModel(SaveMixin, Model, metaclass=SkipModelBase):
         if value := self._prefetched_objects_cache.get(item) is not None:
             return value
         return self._state.fields_cache[item]
+
+    async def save(self, using=None, update_fields=None):
+        """
+        Always do an update
+        """
+        async with deferred.driver():
+            super().save(force_update=True, using=using, update_fields=update_fields)
+
+    async def delete(self, using=None, keep_parents=False):
+        async with deferred.driver():
+            super().delete(using=using, keep_parents=keep_parents)

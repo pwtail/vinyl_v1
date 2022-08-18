@@ -28,8 +28,6 @@ def copy_namespace(model):
     }
     model_vars.update(vars(model))
     for key, val in model_vars.items():
-        if key == 'brands':
-            1
         if hasattr(val, 'field') and val.__module__ == 'django.db.models.fields.related_descriptors':
             if hasattr(val, 'rel_mgr') or hasattr(val, 'related_manager_cls'):
                 from vinyl.descriptors import RelatedManagerDescriptor
