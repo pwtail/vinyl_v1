@@ -27,8 +27,12 @@ def copy_namespace(model):
         for field in model._meta.fields
     }
     model_vars.update(vars(model))
+    parent_fields = set(model._meta.parents.values())
     for key, val in model_vars.items():
-        if hasattr(val, 'field') and val.__module__ == 'django.db.models.fields.related_descriptors':
+        if (field := getattr(val, 'field', None)) and val.__module__ == 'django.db.models.fields.related_descriptors':
+
+            if field in parent_fields:
+                continue
             if hasattr(val, 'rel_mgr') or hasattr(val, 'related_manager_cls'):
                 from vinyl.descriptors import RelatedManagerDescriptor
                 val = RelatedManagerDescriptor()

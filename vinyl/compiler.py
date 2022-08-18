@@ -112,5 +112,3 @@ class SQLInsertCompiler(_compiler.SQLInsertCompiler):
     def execute_sql(self, result_type, **kw):
         for sql, params in self.as_sql():
             add_statement(sql, params)
-import psycopg2
-psycopg2
