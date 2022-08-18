@@ -7,6 +7,7 @@ from django.db.models.query import MAX_GET_RESULTS
 from django.db.models.sql import Query
 from django.db.models.sql.constants import SINGLE, MULTI
 
+from vinyl import deferred
 from vinyl.pre_evaluation import QueryResult
 from vinyl.prefetch import prefetch_related_objects
 
@@ -14,7 +15,7 @@ from vinyl.prefetch import prefetch_related_objects
 class VinylQuerySet(QuerySet):
 
 
-    # almost exact copy
+    # almost exact copy, except for the await statement
     async def get(self, *args, **kwargs):
         if self.query.combinator and (args or kwargs):
             raise NotSupportedError(
@@ -112,6 +113,17 @@ class VinylQuerySet(QuerySet):
             return await self.get()
         except self.model.DoesNotExist:
             return None
+
+    async def delete(self):
+        await self
+        async with deferred.driver():
+            super().delete()
+
+
+
+
+
+
 
 
 

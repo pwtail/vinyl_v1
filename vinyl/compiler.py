@@ -19,17 +19,17 @@ class ExecuteMixin:
         self.query.pre_evaluated = QueryResult(compiler=self, results=results)
         return results
 
+    # def execute_multi
+
     def execute_sql(self, result_type=MULTI, **kw):
         if pre := self.query.pre_evaluated:
             assert pre.compiler is self
             return pre.results
             # TODO del for assertion
-        if tl := getattr(tlocal, 'deferred', None):
-            sql, params = self.as_sql()
-            tl.setdefault('ops', []).append((sql, params))
-            return
-        assert False
-        return super().execute_sql(result_type=result_type)
+        sql, params = self.as_sql()
+        add_statement(sql, params)
+        # assert False
+        # return super().execute_sql(result_type=result_type)
 
     async def async_execute_sql(self, result_type=MULTI):
         assert result_type == MULTI
@@ -112,3 +112,10 @@ class SQLInsertCompiler(_compiler.SQLInsertCompiler):
     def execute_sql(self, result_type, **kw):
         for sql, params in self.as_sql():
             add_statement(sql, params)
+
+
+class SQLDeleteCompiler(_compiler.SQLDeleteCompiler):
+
+    def execute_sql(self, result_type, **kw):
+        sql, params = self.as_sql()
+        add_statement(sql, params)
