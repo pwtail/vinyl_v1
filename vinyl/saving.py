@@ -84,8 +84,6 @@ class SaveMixin:
             )
             await self._insert_table(cls=parent, using=using)
             # Set the parent's PK value to self.
-            if 'A' in str(parent):
-                1
             if field:
                 setattr(self, field.attname, self._get_pk_val(parent._meta))
                 if field.is_cached(self):

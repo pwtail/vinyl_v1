@@ -59,6 +59,7 @@ class ExecuteMixin:
                     results = await cursor.fetchall()
                     return (results,)
                 elif result_type == CURSOR:
+                    assert False
                     return RetCursor(cursor.rowcount, getattr(cursor, 'lastrowid', None))
 
 
