@@ -3,6 +3,7 @@ from collections import deque
 from contextlib import asynccontextmanager
 from contextvars import ContextVar
 
+# TODO rename?
 statements = ContextVar('statements')
 
 def add_statement(*stmt):
