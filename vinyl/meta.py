@@ -1,6 +1,7 @@
 from django.db.models.query_utils import DeferredAttribute
 
-from vinyl.model import VinylModel
+from vinyl.model import VinylModel, ModelPlus
+
 
 def copy_namespace(model):
     ns = {}
@@ -31,9 +32,8 @@ def make_vinyl_model(model):
     if hasattr(model, 'vinyl_model'):
         return model.vinyl_model
     ns = copy_namespace(model)
-    bases = (VinylModel, model)
-    newcls = model.vinyl_model = type(model.__name__, bases, ns)
-    newcls._model = model
+    newcls = model.vinyl_model = type(model.__name__, (VinylModel, model), ns)
+    newcls._model = type(model.__name__, (ModelPlus, model), {})
     return newcls
 
 # def __new__(metacls, name, bases, namespace, *, model):

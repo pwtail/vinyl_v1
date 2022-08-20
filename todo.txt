@@ -20,8 +20,4 @@ prefetch
 
 
 -------------
-
-ForeignKeyDeferredAttribute ???
-
-
-title and title_id - ??
+remove inheritance

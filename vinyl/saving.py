@@ -5,16 +5,6 @@ from vinyl import deferred
 
 class SaveMixin:
 
-    def _do_update(self, base_qs, using, pk_val, values, update_fields, forced_update):
-        """
-        Always return True
-        """
-        filtered = base_qs.filter(pk=pk_val)
-        if not values:
-            return True
-        filtered._update(values)
-        return True
-
     async def _insert_table(self, cls, using=None):
         meta = cls._meta
         pk_val = self._get_pk_val(meta)

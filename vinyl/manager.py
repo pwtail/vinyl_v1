@@ -5,6 +5,7 @@ from django.db.models.signals import class_prepared
 from django.db.models.utils import resolve_callables
 
 from vinyl.meta import make_vinyl_model
+from vinyl.model import ModelPlus
 from vinyl.queryset import VinylQuerySet
 
 
@@ -30,6 +31,8 @@ class VinylManagerDescriptor(ManagerDescriptor):
 
     def create_model(self, django_model, *args, **kw):
         self.manager.model = make_vinyl_model(django_model)
+
+    #TODO: do not store pure django model?
 
     def __set_name__(self, owner, name):
         assert issubclass(owner, models.Model)
