@@ -5,7 +5,7 @@ from django.db.models.sql import compiler as _compiler
 
 from django.db.models.sql.compiler import *
 
-from vinyl.deferred import add_statement
+from vinyl.deferred import add_statement, statements
 from vinyl.pre_evaluation import QueryResult
 
 
@@ -111,7 +111,7 @@ class SQLUpdateCompiler(DeferredCompilerMixin, _compiler.SQLUpdateCompiler):
 
 class SQLInsertCompiler(_compiler.SQLInsertCompiler):
 
-    async def execute_sql(self, returning_fields=None):
+    async def async_execute_sql(self, returning_fields=None):
         assert not (
                 returning_fields
                 and len(self.query.objs) != 1
@@ -159,6 +159,17 @@ class SQLInsertCompiler(_compiler.SQLInsertCompiler):
         if converters:
             rows = list(self.apply_converters(rows, converters))
         return rows
+
+    def sync_execute_sql(self, returning_fields=None):
+        assert not returning_fields
+        for sql, params in self.as_sql():
+            add_statement(sql, params)
+
+    @property
+    def execute_sql(self):
+        if statements.get(None) is not None:
+            return self.sync_execute_sql
+        return self.async_execute_sql
 
 
 class SQLDeleteCompiler(_compiler.SQLDeleteCompiler):

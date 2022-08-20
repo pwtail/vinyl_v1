@@ -2,4 +2,26 @@
 check where prefetch cache is used
 
 
-patches: atomic, send. check for contextvar
+move driver ops to provider
+
+compiler types
+atomic()
+
+related_descriptors
+
+tests
+
+
+------------
+
+queryset ops
+model r-o
+prefetch
+
+
+-------------
+
+ForeignKeyDeferredAttribute ???
+
+
+title and title_id - ??

@@ -59,7 +59,7 @@ class VinylModel(SaveMixin, Model, metaclass=SkipModelBase):
         return ob
 
     def __getitem__(self, item):
-        if value := self._prefetched_objects_cache.get(item) is not None:
+        if (value := self._prefetched_objects_cache.get(item)) is not None:
             return value
         return self._state.fields_cache[item]
 

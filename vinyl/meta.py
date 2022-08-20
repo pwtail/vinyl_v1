@@ -1,3 +1,5 @@
+from django.db.models.query_utils import DeferredAttribute
+
 from vinyl.model import VinylModel
 
 def copy_namespace(model):
@@ -12,12 +14,14 @@ def copy_namespace(model):
         if (field := getattr(val, 'field', None)) and val.__module__ == 'django.db.models.fields.related_descriptors':
             if field in parent_fields:
                 continue
+            if isinstance(val, DeferredAttribute):
+                continue
             if hasattr(val, 'rel_mgr') or hasattr(val, 'related_manager_cls'):
                 from vinyl.descriptors import RelatedManagerDescriptor
-                val = RelatedManagerDescriptor()
+                val = RelatedManagerDescriptor(val)
             else:
                 from vinyl.descriptors import FKDescriptor
-                val = FKDescriptor()
+                val = FKDescriptor(val)
             ns[key] = val
     return ns
 

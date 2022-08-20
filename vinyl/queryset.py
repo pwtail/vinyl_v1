@@ -119,7 +119,9 @@ class VinylQuerySet(QuerySet):
         async with deferred.driver():
             super().delete()
 
-
+    async def insert(self, using=None, **kwargs):
+        instance = self.model(**kwargs)
+        await instance.insert(using=using)
 
 
 

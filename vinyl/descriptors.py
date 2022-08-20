@@ -1,11 +1,18 @@
+from django.db.models.fields.related_descriptors import ForeignKeyDeferredAttribute
+
 from vinyl import deferred
+from vinyl.queryset import VinylQuerySet
+
 
 class FKDescriptor:
+    def __init__(self, wrapped):
+        self.wrapped = wrapped
+
     def __set_name__(self, owner, name):
         self.name = name
 
-    # def __get__(self, instance, owner):
-    #     1
+    def __set__(self, instance, value):
+        return self.wrapped.__set__(instance, value)
 
     def __get__(self, instance, owner):
         django_model = owner._model
@@ -19,8 +26,12 @@ class FKDescriptor:
         return qs.filter(attr.field.get_reverse_related_filter(instance)).get_or_none()
 
 
-
 class RelatedManagerDescriptor:
+    def __init__(self, wrapped):
+        self.wrapped = wrapped
+
+    def __set__(self, instance, value):
+        return self.wrapped.__set__(instance, value)
 
     def __get__(self, instance, owner):
         django_model = owner._model
@@ -30,10 +41,10 @@ class RelatedManagerDescriptor:
         manager = attr.__get__(instance, owner)
         # manager.__class__ = wrap_related_manager(manager.__class__)
         if wrapper := getattr(manager, 'vinyl_wrapper', None):
+            #???
             return wrapper
         manager.vinyl_wrapper = RelatedManagerWrapper(manager)
         return manager.vinyl_wrapper
-
 
     def __set_name__(self, owner, name):
         self.name = name
@@ -58,3 +69,11 @@ class RelatedManagerWrapper:
     async def clear(self, *args, **kw):
         async with deferred.driver():
             self.rel_mgr.clear(*args, **kw)
+
+    def all(self):
+        qs = self.rel_mgr.all()
+        return VinylQuerySet.clone(qs)
+
+
+    def __await__(self):
+        return self.all().__await__()

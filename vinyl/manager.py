@@ -23,7 +23,6 @@ class VinylManagerDescriptor(ManagerDescriptor):
         if model:
             self.manager.model = model
 
-
     def __get__(self, instance, owner):
         assert not instance
         assert self.manager
