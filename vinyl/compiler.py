@@ -14,12 +14,32 @@ class ExecuteMixin:
     def __await__(self):
         return self._await().__await__()
 
+    async def has_results(self):
+        results = await self.async_execute_sql()
+        results = tuple(chain.from_iterable(results))
+        return bool(results)
+
     async def _await(self):
         results = await self.async_execute_sql()
         self.query.pre_evaluated = QueryResult(compiler=self, results=results)
         return results
 
     # def execute_multi
+
+    async def explain_query(self):
+        result = list(await self.async_execute_sql())
+        # Some backends return 1 item tuples with strings, and others return
+        # tuples with integers and strings. Flatten them out into strings.
+        format_ = self.query.explain_info.format
+        output_formatter = json.dumps if format_ and format_.lower() == "json" else str
+        rows = []
+        for row in result[0]:
+            if not isinstance(row, str):
+                rows.append(" ".join(output_formatter(c) for c in row))
+            else:
+                rows.append(row)
+        #TODO pprint
+        return '\n'.join(rows)
 
     def execute_sql(self, result_type=MULTI, **kw):
         if pre := self.query.pre_evaluated:

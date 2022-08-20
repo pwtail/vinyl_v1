@@ -1,4 +1,11 @@
+TOP
 
+queryset & queries
+driver -> provider
+tests
+
+
+---------------
 check where prefetch cache is used
 
 
@@ -27,3 +34,9 @@ class NewModel:
     method = Proxy()
 
 -----------
+
+set base manager for vinyl model?
+
+---------
+
+repr!!

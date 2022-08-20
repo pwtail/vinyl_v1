@@ -7,6 +7,7 @@ from django.db.models.base import ModelBase
 from vinyl import deferred
 from vinyl.saving import SaveMixin
 
+
 class VinylMetaD:
     def __get__(self, instance, owner):
         return owner._model._meta
