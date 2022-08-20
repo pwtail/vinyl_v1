@@ -20,4 +20,10 @@ prefetch
 
 
 -------------
-remove inheritance
+direct inheritance can be limited:
+
+class NewModel:
+
+    method = Proxy()
+
+-----------

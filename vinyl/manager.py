@@ -32,8 +32,6 @@ class VinylManagerDescriptor(ManagerDescriptor):
     def create_model(self, django_model, *args, **kw):
         self.manager.model = make_vinyl_model(django_model)
 
-    #TODO: do not store pure django model?
-
     def __set_name__(self, owner, name):
         assert issubclass(owner, models.Model)
         self.manager.name = name
