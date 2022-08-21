@@ -40,3 +40,7 @@ set base manager for vinyl model?
 ---------
 
 repr!!
+
+----
+
+no bulk_create

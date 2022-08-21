@@ -1,6 +1,7 @@
-from django.db import NotSupportedError, connections
+from django.db import NotSupportedError, connections, IntegrityError
 from django.db.models import QuerySet, Model
 from django.db.models.query import MAX_GET_RESULTS
+from django.db.models.utils import resolve_callables
 
 from vinyl import deferred
 from vinyl.prefetch import prefetch_related_objects
@@ -186,3 +187,38 @@ class VinylQuerySet(QuerySet):
     async def update(self, **kwargs):
         async with deferred.driver():
             super().update(**kwargs)
+
+    #TODO transaction
+    async def get_or_create(self, defaults=None, **kwargs):
+        """
+        Look up an object with the given kwargs, creating one if necessary.
+        Return a tuple of (object, created), where created is a boolean
+        specifying whether an object was created.
+        """
+        # The get() needs to be targeted at the write database in order
+        # to avoid potential transaction consistency problems.
+        self._for_write = True
+        try:
+            return (await self.get(**kwargs)), False
+        except self.model.DoesNotExist:
+            params = self._extract_model_params(defaults, **kwargs)
+            # Try to create an object using passed params.
+            try:
+                params = dict(resolve_callables(params))
+                return (await self.create(**params)), True
+            except IntegrityError:
+                try:
+                    return (await self.get(**kwargs)), False
+                except self.model.DoesNotExist:
+                    pass
+                raise
+
+    async def create(self, **kwargs):
+        """
+        Create a new object with the given kwargs, saving it to the database
+        and returning the created object.
+        """
+        obj = self.model(**kwargs)
+        self._for_write = True
+        await obj.insert(using=self.db)
+        return obj
