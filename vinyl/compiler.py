@@ -42,7 +42,7 @@ class ExecuteMixin:
         return '\n'.join(rows)
 
     def execute_sql(self, result_type=MULTI, **kw):
-        if pre := self.query.pre_evaluated:
+        if pre := getattr(self.query, 'pre_evaluated', None):
             assert pre.compiler is self
             return pre.results
             # TODO del for assertion
