@@ -63,42 +63,30 @@ class RelatedManagerWrapper:
         async with deferred.driver():
             self.rel_mgr.add(*args, **kw)
 
-    # async def set(self, *args, **kw):
-    #     async with deferred.driver():
-    #         self.rel_mgr.set(*args, **kw)
-
-    #TODO transaction
-    async def set(self, objs, *, clear=False, through_defaults=None):
-        # Force evaluation of `objs` in case it's a queryset whose value
-        # could be affected by `manager.clear()`. Refs #19816.
+    async def set(self, objs, *, through_defaults=None):
         objs = tuple(objs)
 
         db = router.db_for_write(self.through, instance=self.instance)
-        # with transaction.atomic(using=db, savepoint=False):
-        if clear:
-            await self.clear()
-            await self.add(*objs, through_defaults=through_defaults)
-        else:
-            qs = self.using(db).values_list(
-                self.target_field.target_field.attname, flat=True
+        qs = self.using(db).values_list(
+            self.target_field.target_field.attname, flat=True
+        )
+        qs = VinylQuerySet.clone(qs)
+        old_ids = set(await qs)
+
+        new_objs = []
+        for obj in objs:
+            fk_val = (
+                self.target_field.get_foreign_related_value(obj)[0]
+                if isinstance(obj, self.model)
+                else self.target_field.get_prep_value(obj)
             )
-            qs = VinylQuerySet.clone(qs)
-            old_ids = set(await qs)
+            if fk_val in old_ids:
+                old_ids.remove(fk_val)
+            else:
+                new_objs.append(obj)
 
-            new_objs = []
-            for obj in objs:
-                fk_val = (
-                    self.target_field.get_foreign_related_value(obj)[0]
-                    if isinstance(obj, self.model)
-                    else self.target_field.get_prep_value(obj)
-                )
-                if fk_val in old_ids:
-                    old_ids.remove(fk_val)
-                else:
-                    new_objs.append(obj)
-
-            await self.remove(*old_ids)
-            await self.add(*new_objs, through_defaults=through_defaults)
+        await self.remove(*old_ids)
+        await self.add(*new_objs, through_defaults=through_defaults)
 
     async def remove(self, *args, **kw):
         async with deferred.driver():

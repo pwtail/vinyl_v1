@@ -1,12 +1,13 @@
-from django.db.models import Field
+from django.apps import AppConfig
+from django.db import models
 from django.db.models.manager import BaseManager, ManagerDescriptor
-from django.db import models, router
-from django.db.models.signals import class_prepared
-from django.db.models.utils import resolve_callables
+from django.dispatch import Signal
 
 from vinyl.meta import make_vinyl_model
-from vinyl.model import ModelPlus
 from vinyl.queryset import VinylQuerySet
+
+
+init_models = Signal()
 
 
 class _VinylManager(BaseManager.from_queryset(VinylQuerySet)):
@@ -37,7 +38,7 @@ class VinylManagerDescriptor(ManagerDescriptor):
         self.manager.name = name
         self.django_model = owner
         create_model = lambda *args, **kw: self.create_model(owner, *args, **kw)
-        class_prepared.connect(create_model, sender=owner)
+        init_models.connect(create_model, sender=AppConfig)
 
 
 VinylManager = VinylManagerDescriptor
