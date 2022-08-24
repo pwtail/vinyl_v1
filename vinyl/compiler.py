@@ -102,7 +102,10 @@ class SQLCompiler(ExecuteMixin, _compiler.SQLCompiler):
 class DeferredCompilerMixin:
     def execute_sql(self, result_type, **kw):
         # print(result_type)
-        sql, params = self.as_sql()
+        try:
+            sql, params = self.as_sql()
+        except EmptyResultSet:
+            return
         add_statement(sql, params)
 
 

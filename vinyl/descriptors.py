@@ -1,4 +1,5 @@
 from django.db import router
+from django.db.models import ForeignKey
 from django.db.models.fields.related_descriptors import ForeignKeyDeferredAttribute
 
 from vinyl import deferred
@@ -44,7 +45,11 @@ class RelatedManagerDescriptor:
         if wrapper := getattr(manager, 'vinyl_wrapper', None):
             #???
             return wrapper
-        manager.vinyl_wrapper = RelatedManagerWrapper(manager)
+        if (field := getattr(manager, 'field', None)) and isinstance(field, ForeignKey):
+            manager_cls = ReverseManyToOneManager
+        else:
+            manager_cls = M2MManager
+        manager.vinyl_wrapper = manager_cls(manager)
         return manager.vinyl_wrapper
 
     def __set_name__(self, owner, name):
@@ -62,6 +67,24 @@ class RelatedManagerWrapper:
     async def add(self, *args, **kw):
         async with deferred.driver():
             self.rel_mgr.add(*args, **kw)
+
+    async def remove(self, *args, **kw):
+        async with deferred.driver():
+            self.rel_mgr.remove(*args, **kw)
+
+    async def clear(self, *args, **kw):
+        async with deferred.driver():
+            self.rel_mgr.clear(*args, **kw)
+
+    def all(self):
+        qs = self.rel_mgr.all()
+        return VinylQuerySet.clone(qs)
+
+
+    def __await__(self):
+        return self.all().__await__()
+
+class M2MManager(RelatedManagerWrapper):
 
     async def set(self, objs, *, through_defaults=None):
         objs = tuple(objs)
@@ -88,18 +111,27 @@ class RelatedManagerWrapper:
         await self.remove(*old_ids)
         await self.add(*new_objs, through_defaults=through_defaults)
 
-    async def remove(self, *args, **kw):
-        async with deferred.driver():
-            self.rel_mgr.remove(*args, **kw)
 
-    async def clear(self, *args, **kw):
-        async with deferred.driver():
-            self.rel_mgr.clear(*args, **kw)
+class ReverseManyToOneManager(RelatedManagerWrapper):
 
-    def all(self):
-        qs = self.rel_mgr.all()
-        return VinylQuerySet.clone(qs)
+    async def set(self, objs, *, bulk=True, clear=False):
+        self._check_fk_val()
+        # Force evaluation of `objs` in case it's a queryset whose value
+        # could be affected by `manager.clear()`. Refs #19816.
+        objs = tuple(objs)
 
+        if self.field.null:
+            db = router.db_for_write(self.model, instance=self.instance)
+            old_objs = self.using(db).all()
+            old_objs = await VinylQuerySet.clone(old_objs)
+            new_objs = []
+            for obj in objs:
+                if obj in old_objs:
+                    old_objs.remove(obj)
+                else:
+                    new_objs.append(obj)
 
-    def __await__(self):
-        return self.all().__await__()
+            await self.remove(*old_objs, bulk=bulk)
+            await self.add(*new_objs, bulk=bulk)
+        else:
+            await self.add(*objs, bulk=bulk)
