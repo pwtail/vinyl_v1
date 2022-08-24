@@ -11,8 +11,6 @@ def copy_namespace(model):
     }
     model_vars.update(vars(model))
     parent_fields = set(model._meta.parents.values())
-    if 'Size' in str(model):
-        1
     for key, val in model_vars.items():
         if (field := getattr(val, 'field', None)) and val.__module__ == 'django.db.models.fields.related_descriptors':
             if field in parent_fields:
