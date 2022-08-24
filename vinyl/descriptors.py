@@ -80,9 +80,9 @@ class RelatedManagerWrapper:
         qs = self.rel_mgr.all()
         return VinylQuerySet.clone(qs)
 
-
     def __await__(self):
         return self.all().__await__()
+
 
 class M2MManager(RelatedManagerWrapper):
 
