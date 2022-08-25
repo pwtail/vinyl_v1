@@ -11,18 +11,21 @@ from vinyl.pre_evaluation import QueryResult
 
 class ExecuteMixin:
 
+    results = None
+
     def __await__(self):
         return self._await().__await__()
 
     async def has_results(self):
         results = await self.async_execute_sql()
-        results = tuple(chain.from_iterable(results))
-        return bool(results)
+        # results = tuple(chain.from_iterable(results))
+        return bool(results[0])
 
     async def _await(self):
-        results = await self.async_execute_sql()
-        self.query.pre_evaluated = QueryResult(compiler=self, results=results)
-        return results
+        self.results = await self.async_execute_sql()
+        self.query.get_compiler = lambda *args, **kw: self
+        # self.query.pre_evaluated = QueryResult(compiler=self, results=results)
+        return self.results
 
     # def execute_multi
 
@@ -42,9 +45,8 @@ class ExecuteMixin:
         return '\n'.join(rows)
 
     def execute_sql(self, result_type=MULTI, **kw):
-        if pre := getattr(self.query, 'pre_evaluated', None):
-            assert pre.compiler is self
-            return pre.results
+        if self.results is not None:
+            return self.results
             # TODO del for assertion
         sql, params = self.as_sql()
         add_statement(sql, params)

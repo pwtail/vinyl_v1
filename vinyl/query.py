@@ -22,11 +22,6 @@ class VinylQuery(Query):
             query.model = query.model.vinyl_model
         return query
 
-    def get_compiler(self, using=None, connection=None, elide_empty=True):
-        if pre := self.pre_evaluated:
-            return pre.compiler
-        return super().get_compiler(using=using, connection=connection, elide_empty=elide_empty)
-
     async def get_aggregation(self, using, added_aggregate_names):
         """
         Return the dictionary with the values of the existing aggregations.
