@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 django = {editable = true, path = "/home/pwtail/sof/godjan"}
 psycopg = "*"
+psycopg-pool = "*"
 
 [dev-packages]
 

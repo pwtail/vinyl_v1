@@ -9,7 +9,7 @@ from vinyl.deferred import add_statement, statements
 from vinyl.pre_evaluation import QueryResult
 
 
-class ExecuteMixin:
+class ExecuteMixin(_compiler.SQLCompiler):
 
     results = None
 
@@ -50,8 +50,6 @@ class ExecuteMixin:
             # TODO del for assertion
         sql, params = self.as_sql()
         add_statement(sql, params)
-        # assert False
-        # return super().execute_sql(result_type=result_type)
 
     async def async_execute_sql(self, result_type=MULTI):
         assert result_type == MULTI
@@ -61,28 +59,28 @@ class ExecuteMixin:
             if not sql:
                 raise EmptyResultSet
         except EmptyResultSet:
-            if result_type == MULTI:
-                return iter([])
-            else:
-                return None
-        #TODO use pool
-        import psycopg
-        async with await psycopg.AsyncConnection.connect(
-                "dbname=lulka user=postgres"
-        ) as aconn:
-            async with aconn.cursor() as cursor:
-                await cursor.execute(sql, params)
-                if result_type == SINGLE:
-                    val = await cursor.fetchone()
-                    if val:
-                        return val[0:self.col_count]
-                    return val
-                elif result_type == MULTI:
-                    results = await cursor.fetchall()
-                    return (results,)
-                elif result_type == CURSOR:
-                    assert False
-                    return RetCursor(cursor.rowcount, getattr(cursor, 'lastrowid', None))
+            return iter([])
+        return await connections[self.using].execute_sql(sql, params)
+        #
+        #
+        # #TODO use pool
+        # import psycopg
+        # async with await psycopg.AsyncConnection.connect(
+        #         "dbname=lulka user=postgres"
+        # ) as aconn:
+        #     async with aconn.cursor() as cursor:
+        #         await cursor.execute(sql, params)
+        #         if result_type == SINGLE:
+        #             val = await cursor.fetchone()
+        #             if val:
+        #                 return val[0:self.col_count]
+        #             return val
+        #         elif result_type == MULTI:
+        #             results = await cursor.fetchall()
+        #             return (results,)
+        #         elif result_type == CURSOR:
+        #             assert False
+        #             return RetCursor(cursor.rowcount, getattr(cursor, 'lastrowid', None))
 
 
 class SQLCompiler(ExecuteMixin, _compiler.SQLCompiler):
@@ -109,25 +107,6 @@ class DeferredCompilerMixin:
         except EmptyResultSet:
             return
         add_statement(sql, params)
-
-
-#TODO remove
-class RetCursor(typing.NamedTuple):
-    """
-    An object to return when result_type is CURSOR
-    """
-    rowcount: int
-    lastrowid: object
-
-    def __enter__(self):
-        pass
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        pass
-
-    def close(self):
-        pass
-
 
 
 class SQLUpdateCompiler(DeferredCompilerMixin, _compiler.SQLUpdateCompiler):
