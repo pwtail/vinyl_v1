@@ -22,10 +22,14 @@ class AtomicPatch:
 class SignalPatch:
 
     def send(*args, **kwargs):
-        pass
+        if statements.get(None) is not None:
+            return
+        return Signal.send(*args, **kwargs)
 
     def send_robust(*args, **kwargs):
-        pass
+        if statements.get(None) is not None:
+            return
+        return Signal.send_robust(*args, **kwargs)
 
 
 @contextmanager
