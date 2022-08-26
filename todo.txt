@@ -47,4 +47,4 @@ no bulk_create
 
 ---------
 
-check insert with mariadb
+mark methods that contain I/O
