@@ -130,40 +130,35 @@ class SQLInsertCompiler(_compiler.SQLInsertCompiler):
         opts = self.query.get_meta()
         self.returning_fields = returning_fields
 
-        import psycopg
-        async with await psycopg.AsyncConnection.connect(
-                "dbname=lulka user=postgres"
-        ) as aconn:
+        async with connections[self.using].cursor() as cursor:
+            for sql, params in self.as_sql():
+                await cursor.execute(sql, params)
 
-            async with aconn.cursor() as cursor:
-                for sql, params in self.as_sql():
-                    await cursor.execute(sql, params)
-
-                if not self.returning_fields:
-                    return []
-                if (
-                        self.connection.features.can_return_rows_from_bulk_insert
-                        and len(self.query.objs) > 1
-                ):
-                    rows = await self.connection.ops.fetch_returned_insert_rows(cursor)
-                elif self.connection.features.can_return_columns_from_insert:
-                    assert len(self.query.objs) == 1
-                    rows = [
-                        await self.connection.ops.fetch_returned_insert_columns(
+            if not self.returning_fields:
+                return []
+            if (
+                    self.connection.features.can_return_rows_from_bulk_insert
+                    and len(self.query.objs) > 1
+            ):
+                rows = await self.connection.ops.fetch_returned_insert_rows(cursor)
+            elif self.connection.features.can_return_columns_from_insert:
+                assert len(self.query.objs) == 1
+                rows = [
+                    await self.connection.ops.fetch_returned_insert_columns(
+                        cursor,
+                        self.returning_params,
+                    )
+                ]
+            else:
+                rows = [
+                    (
+                        self.connection.ops.last_insert_id(
                             cursor,
-                            self.returning_params,
-                        )
-                    ]
-                else:
-                    rows = [
-                        (
-                            self.connection.ops.last_insert_id(
-                                cursor,
-                                opts.db_table,
-                                opts.pk.column,
-                            ),
-                        )
-                    ]
+                            opts.db_table,
+                            opts.pk.column,
+                        ),
+                    )
+                ]
         cols = [field.get_col(opts.db_table) for field in self.returning_fields]
         converters = self.get_converters(cols)
         if converters:

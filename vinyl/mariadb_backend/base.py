@@ -52,6 +52,7 @@ class DatabaseWrapper(_DatabaseWrapper):
     async def start_pool(self):
         kwargs = self.get_connection_params()
         self.async_pool = await aiomysql.create_pool(**kwargs)
+        await self.get_mysql_server_data()
         return self.async_pool
 
 
@@ -90,6 +91,7 @@ class DatabaseWrapper(_DatabaseWrapper):
                 yield conn
             except:
                 await conn.rollback()
+                raise
             else:
                 await conn.commit()
 
@@ -99,3 +101,29 @@ class DatabaseWrapper(_DatabaseWrapper):
         """
         async with self.cursor() as cursor:
             await cursor.execute(sql, params)
+
+    async def get_mysql_server_data(self):
+        async with self.cursor() as cursor:
+            # Select some server variables and test if the time zone
+            # definitions are installed. CONVERT_TZ returns NULL if 'UTC'
+            # timezone isn't loaded into the mysql.time_zone table.
+            await cursor.execute(
+                """
+                SELECT VERSION(),
+                       @@sql_mode,
+                       @@default_storage_engine,
+                       @@sql_auto_is_null,
+                       @@lower_case_table_names,
+                       CONVERT_TZ('2001-01-01 01:00:00', 'UTC', 'UTC') IS NOT NULL
+            """
+            )
+            row = await cursor.fetchone()
+        self.mysql_server_data = {
+            "version": row[0],
+            "sql_mode": row[1],
+            "default_storage_engine": row[2],
+            "sql_auto_is_null": bool(row[3]),
+            "lower_case_table_names": bool(row[4]),
+            "has_zoneinfo_database": bool(row[5]),
+        }
+        return self.mysql_server_data
