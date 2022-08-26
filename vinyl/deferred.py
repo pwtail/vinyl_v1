@@ -1,4 +1,5 @@
 import threading
+import typing
 from collections import deque
 from contextlib import asynccontextmanager
 from contextvars import ContextVar
@@ -8,10 +9,15 @@ from vinyl import patches
 # TODO rename?
 statements = ContextVar('statements')
 
-def add_statement(*stmt):
-    statements.get().append(stmt)
 
 
+class Statement(typing.NamedTuple):
+    sql: str
+    params: tuple
+    using: str
+
+
+#TODO using
 @asynccontextmanager
 async def driver():
     token = statements.set(value := deque())
@@ -25,7 +31,7 @@ async def driver():
         statements.reset(token)
 
 
-# transaction?
+@atomic()
 async def execute_statements(statements):
     # TODO use pool
     import psycopg

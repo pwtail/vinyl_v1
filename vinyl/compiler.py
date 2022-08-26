@@ -5,13 +5,17 @@ from django.db.models.sql import compiler as _compiler
 
 from django.db.models.sql.compiler import *
 
-from vinyl.deferred import add_statement, statements
+from vinyl.deferred import statements
 from vinyl.pre_evaluation import QueryResult
 
 
 class ExecuteMixin(_compiler.SQLCompiler):
 
     results = None
+
+    def add_statement(self, *stmt):
+        stmt = (*stmt, self.using)
+        statements.get().append(stmt)
 
     def __await__(self):
         return self._await().__await__()
@@ -49,7 +53,7 @@ class ExecuteMixin(_compiler.SQLCompiler):
             return self.results
             # TODO del for assertion
         sql, params = self.as_sql()
-        add_statement(sql, params)
+        self.add_statement(sql, params)
 
     async def async_execute_sql(self, result_type=MULTI):
         assert result_type == MULTI
@@ -106,7 +110,7 @@ class DeferredCompilerMixin:
             sql, params = self.as_sql()
         except EmptyResultSet:
             return
-        add_statement(sql, params)
+        self.add_statement(sql, params)
 
 
 class SQLUpdateCompiler(DeferredCompilerMixin, _compiler.SQLUpdateCompiler):
@@ -167,7 +171,7 @@ class SQLInsertCompiler(_compiler.SQLInsertCompiler):
     def sync_execute_sql(self, returning_fields=None):
         assert not returning_fields
         for sql, params in self.as_sql():
-            add_statement(sql, params)
+            self.add_statement(sql, params)
 
     @property
     def execute_sql(self):
@@ -180,4 +184,4 @@ class SQLDeleteCompiler(_compiler.SQLDeleteCompiler):
 
     def execute_sql(self, result_type, **kw):
         sql, params = self.as_sql()
-        add_statement(sql, params)
+        self.add_statement(sql, params)

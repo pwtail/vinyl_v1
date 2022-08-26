@@ -44,3 +44,7 @@ repr!!
 ----
 
 no bulk_create
+
+---------
+
+check insert with mariadb

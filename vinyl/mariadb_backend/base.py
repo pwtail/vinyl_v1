@@ -49,6 +49,8 @@ class DatabaseWrapper(_DatabaseWrapper):
         self.async_pool = await aiomysql.create_pool(**kwargs)
         return self.async_pool
 
+
+    #split into conn & cursor
     @asynccontextmanager
     async def cursor(self):
         if self.async_pool is None:
@@ -69,5 +71,13 @@ class DatabaseWrapper(_DatabaseWrapper):
             finally:
                 self.async_connection.reset(token)
 
+    # @asynccontextmanager
+    def transaction(self):
+        if (conn := self.async_connection.get()):
+            return conn.transaction()
+        conn = self.get_connection_from_pool()
+
     def get_connection_from_pool(self):
         return self.async_pool.acquire()
+
+
