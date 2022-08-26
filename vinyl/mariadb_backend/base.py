@@ -55,8 +55,6 @@ class DatabaseWrapper(_DatabaseWrapper):
         await self.get_mysql_server_data()
         return self.async_pool
 
-
-    #split into conn & cursor
     @asynccontextmanager
     async def cursor(self):
         if self.async_pool is None:
