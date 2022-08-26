@@ -56,8 +56,8 @@ class DatabaseWrapper(_DatabaseWrapper):
 
     @asynccontextmanager
     async def cursor(self):
-        if self.async_pool is None:
-            await self.start_pool()
+        # if self.async_pool is None:
+        #     await self.start_pool()
         if (conn := self.async_connection.get()) is not None:
             async with conn.cursor() as cur:
                 if self.CursorWrapper:
@@ -74,5 +74,21 @@ class DatabaseWrapper(_DatabaseWrapper):
             finally:
                 self.async_connection.reset(token)
 
-    def get_connection_from_pool(self):
-        return self.async_pool.connection()
+    @asynccontextmanager
+    async def get_connection_from_pool(self):
+        if self.async_pool is None:
+            await self.start_pool()
+        async with self.async_pool.connection() as conn:
+            yield conn
+
+    def transaction(self):
+        if self.async_connection.get():
+            return no_op()
+        return self.get_connection_from_pool()
+
+    async def execute_only(self, sql, params):
+        """
+        Execute but do not fetch
+        """
+        async with self.cursor() as cursor:
+            await cursor.execute(sql, params)

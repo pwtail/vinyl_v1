@@ -4,6 +4,8 @@ from collections import deque
 from contextlib import asynccontextmanager
 from contextvars import ContextVar
 
+from django.db import connections
+
 from vinyl import patches
 
 # TODO rename?
@@ -17,29 +19,25 @@ class Statement(typing.NamedTuple):
     using: str
 
 
-#TODO using
+class StatementsDeque(deque):
+    using = None
+
+    def __bool__(self):
+        return super().__bool__()
+
+
 @asynccontextmanager
 async def driver():
-    token = statements.set(value := deque())
+    token = statements.set(value := StatementsDeque())
     try:
         with patches.apply():
             yield value
-        await execute_statements(value)
+        connection = connections[value.using]
+        async with connection.transaction():
+            for sql, params in value:
+                await connection.execute_only(sql, params)
     finally:
         if value:
             print('not all statements did execute')
         statements.reset(token)
 
-
-@atomic()
-async def execute_statements(statements):
-    # TODO use pool
-    import psycopg
-    async with await psycopg.AsyncConnection.connect(
-            "dbname=lulka user=postgres"
-    ) as aconn:
-        while statements:
-            sql, params = statements.popleft()
-            async with aconn.cursor() as cursor:
-                print(sql, params)
-                await cursor.execute(sql, params)

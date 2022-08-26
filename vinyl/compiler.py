@@ -1,21 +1,23 @@
-import typing
-
 from django.db import connections
 from django.db.models.sql import compiler as _compiler
-
 from django.db.models.sql.compiler import *
 
 from vinyl.deferred import statements
-from vinyl.pre_evaluation import QueryResult
 
 
-class ExecuteMixin(_compiler.SQLCompiler):
+class StatementsMixin:
+    def add_statement(self, *stmt):
+        items = statements.get()
+        if not items:
+            items.using = self.using
+        else:
+            assert items.using == self.using
+        items.append(stmt)
+
+
+class ExecuteMixin(StatementsMixin, _compiler.SQLCompiler):
 
     results = None
-
-    def add_statement(self, *stmt):
-        stmt = (*stmt, self.using)
-        statements.get().append(stmt)
 
     def __await__(self):
         return self._await().__await__()
@@ -103,7 +105,7 @@ class SQLCompiler(ExecuteMixin, _compiler.SQLCompiler):
     #
     1
 
-class DeferredCompilerMixin:
+class DeferredCompilerMixin(StatementsMixin):
     def execute_sql(self, result_type, **kw):
         # print(result_type)
         try:

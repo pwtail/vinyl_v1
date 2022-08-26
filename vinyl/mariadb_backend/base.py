@@ -1,4 +1,4 @@
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, contextmanager
 from contextvars import ContextVar
 
 from django.db.backends.mysql.base import DatabaseWrapper as _DatabaseWrapper, django_conversions
@@ -6,6 +6,11 @@ from django.db.backends.mysql.base import DatabaseWrapper as _DatabaseWrapper, d
 from vinyl.mariadb_backend.ops import DatabaseOperations
 
 import aiomysql
+
+@contextmanager
+def no_op():
+    yield
+
 
 class DatabaseWrapper(_DatabaseWrapper):
     ops_class = DatabaseOperations
@@ -71,13 +76,26 @@ class DatabaseWrapper(_DatabaseWrapper):
             finally:
                 self.async_connection.reset(token)
 
-    # @asynccontextmanager
     def transaction(self):
-        if (conn := self.async_connection.get()):
-            return conn.transaction()
-        conn = self.get_connection_from_pool()
+        if self.async_connection.get():
+            return no_op()
+        return self.get_connection_from_pool()
 
-    def get_connection_from_pool(self):
-        return self.async_pool.acquire()
+    @asynccontextmanager
+    async def get_connection_from_pool(self):
+        if self.async_pool is None:
+            await self.start_pool()
+        async with self.async_pool.acquire() as conn:
+            try:
+                yield conn
+            except:
+                await conn.rollback()
+            else:
+                await conn.commit()
 
-
+    async def execute_only(self, sql, params):
+        """
+        Execute but do not fetch
+        """
+        async with self.cursor() as cursor:
+            await cursor.execute(sql, params)
