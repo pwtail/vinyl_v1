@@ -25,7 +25,8 @@ class M(models.Model):
 ```
 
 The default database for vinyl is `'vinyl_default'`. `vinyl` provides the 
-respective backends. So, here is what you should have in the `settings.py`:
+respective backends. So, here is roughly what you should have in the `settings.
+py`:
 
 ```python
 DATABASES = {
