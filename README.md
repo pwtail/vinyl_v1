@@ -11,28 +11,46 @@ Goals:
 - be close to classic django in terms of API
 
 
-currently - alfa stage
+Currently vinyl is at the *alfa* stage
 
-**A plugin**
+**A model manager**
 
-This is a third-party package that, once installed, adds async capabilities 
-to your django project. It doesn't break your existing code. Its main entity is 
-the `VinylManager` class, which is, as you could guess, a model manager.
+The main entry point to the magic is the model manager, which you need to 
+add alongside 
+the relular one (`objects`, likely).
 
 ```python
-
-
 class M(models.Model):
   ...
   vinyl = VinylManager()
 ```
 
-rflkerfmlw
+The default database for vinyl is `'vinyl_default'`. `vinyl` provides the 
+respective backends. So, here is what you should have in the `settings.py`:
+
+```python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'PASSWORD': 'postgres',
+        'USER': 'postgres',
+        'NAME': 'mydb',
+    },
+    'vinyl_default': {
+        'ENGINE': 'vinyl.postgresql_backend',
+        'PASSWORD': 'postgres',
+        'USER': 'postgres',
+        'NAME': 'mydb',
+    },
+}
+```
+
+Now you can try the magic:
 
 ```python
 await M.vinyl.all()
 ob = await M.vinyl.get()
-await ob.related_set
+await ob.related_set.all()
 ob.related_obj = related_obj
 await ob.save()
 ```
