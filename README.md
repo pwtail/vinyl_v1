@@ -116,12 +116,18 @@ to only support the case where all models in the inheritance chain share
 the same primary key. This would simplify the logic of CRUD operations (and 
 their bulk variants).
 
-Of the databases, **PostgreSql** amd **MySql/MariaDb** are supported. As in 
-django, the database support is provided by database backends, so can 
+Of the databases, **PostgreSql** amd **MySql/MariaDb** are supported. I used 
+the psycopg3 driver instead of the asyncpg, but I think, I will make some 
+benchmarks in the nearest future. 
+
+As in django, the database support is provided by database backends, so can 
 be contributed easily.
 
+Also, since vinyl uses django models, you have the django admin available as 
+well as the migrations.
 
-**Database drivers**
+**Nearest plans**
 
-**Plans, directions**
+- moving to beta, adding tests
+- psycopg or asyncpg?
 
