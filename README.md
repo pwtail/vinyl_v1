@@ -54,11 +54,27 @@ ob.related_obj = related_obj
 await ob.save()
 ```
 
-**Async-only**
+`M.objects.all()` will keep working, of course, like the rest of django.
 
-However doesn't break code and is similar
+**Model instances (aka the objects). How to do an insert**
 
-**Insert**
+Like django itself, vinyl builds a lot of its API around the model 
+instances (CRUD operations, related attributes, etc). But since the API is 
+different from django (namely, it is async), vinyl uses a different class for 
+the model:
+
+```
+In [1]: (await M.vinyl.first()).__class__
+Out[1]: vinyl.model.M
+```
+
+You can access the class of the vinyl model through `M.vinyl.model`, but 
+generally you don't have to. With vinyl, you do not directly instantiate the 
+models. When making a query, you get the instantiated objects already, and 
+to create an object (make an insert) you should use `M.vinyl.create(**kwargs)`.
+In other words, `await obj.save()` is used only for an update. As a side 
+effect from separating an insert from an update, the saving code got much 
+cleaner.
 
 **Lazy attributes, prefetch_related and the like**
 
