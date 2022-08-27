@@ -10,7 +10,6 @@ from vinyl.query import VinylQuery
 
 class VinylQuerySet(QuerySet):
 
-
     # almost exact copy, except for the await statement
     async def get(self, *args, **kwargs):
         if self.query.combinator and (args or kwargs):
