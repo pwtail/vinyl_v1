@@ -1,5 +1,6 @@
 The vinyl project (aka async django)
 ---------------
+*currently at alfa stage*
 
 The vinyl project is an initiative (unofficial though) to continue adding the 
 async support to django. The main task is porting the **django orm** - the main 
@@ -10,7 +11,7 @@ Goals:
 - be compatible with django models, not break existing code
 - be close to classic django in terms of API
 
-*currently at alfa stage*
+
 
 **A model manager**
 
