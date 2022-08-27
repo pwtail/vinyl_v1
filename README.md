@@ -1,10 +1,15 @@
 The vinyl project (aka async django)
 
-The vinyl project is an initiative (unofficial though) to add native async 
-support to django. Currently, the vinyl python package adds the async 
-support to the django orm, 
-the main remaining obstacle on the way to making django async. Yes, you've 
+The vinyl project is an initiative (unofficial though) to continue adding the 
+async support to django. Currently, the vinyl python package is adding it for 
+the django orm, the main remaining obstacle in the way. Yes, you've 
 been waiting for this.
+
+Goals:
+- native asynchrony
+- be compatible with django models, not break existing code
+- be close to classic django in terms of API
+
 
 currently - alfa stage
 
