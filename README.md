@@ -98,7 +98,7 @@ To get the prefetched values one should use
 dictionary access:
 
 ```python
-obj['related_obj']
+obj = M.vinyl.prefetch_related('related_set').first()
 obj['related_set']
 ```
 
@@ -106,7 +106,7 @@ Again, making the API more explicit is only a plus, in my opinion.
 
 **What is supported**
 
-Currently, almost all of django API is supported one way or another, 
+Currently, almost all of django API is supported in one way or another, 
 with a few exceptions:
 
 - no signals
