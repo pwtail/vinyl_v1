@@ -126,9 +126,33 @@ be contributed easily.
 Also, since vinyl uses django models, you have the django admin available as 
 well as the migrations.
 
-**Nearest plans**
+**Plans for release**
 
 - moving to beta, adding tests
 - psycopg or asyncpg?
-- to not increase the scope
+- Not to increase the scope
 
+**How was this made possible?**
+
+First of all, django turned out to be pretty extensible itself. Here I want to 
+mention database backends, compilers, ability to use a 
+non-default database.
+
+Second, there are things specific to an orm in general and to django in 
+particular, that make porting easier. Here I will draw a simplified picture. 
+
+For the read-access, we usually use querysets. These are lazy, so are not 
+evaluated until you decide so. One would naturally want to do that in the 
+`__await__` 
+method. It turned out pretty easy to pre-evaluate a queryset, and then launch 
+the usual procedure, reusing the compiler from the pre-evaluation step.
+
+Next, there is write access: CRUD operations and the like. These generally 
+execute some SQL, not being interested in the result. I mean, we need to know 
+whether it was a success or not, but do not need to fetch the results, by 
+doing, for example, `cursor.fetchall()`. These operations can simply store all 
+the queries they need to make and then to execute them in deferred fashion.
+
+As a result, we get an async-native implementation, which is a much better 
+solution than other hacky tricks. An example for the latter can be 
+sqlalchemy, which resorted to greenlets for the similar purpose. 
