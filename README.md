@@ -70,16 +70,29 @@ Out[1]: vinyl.model.M
 You can access the class of the vinyl model through `M.vinyl.model`, but 
 generally you don't have to. With vinyl, you do not directly instantiate the 
 models. When making a query, you get the instantiated objects already, and 
-to create an object (make an insert) you should use `M.vinyl.create(**kwargs)`.
-In other words, `await obj.save()` is used only for an update. As a side 
-effect from separating an insert from an update, the saving code got much 
+for inserts you should use
+
+```python
+obj = await M.vinyl.create(**kwargs)
+```
+
+In other words, update and insert are separated. `Model.save` can only be 
+used for an update. Not only a more explicit API is better in my opinion, 
+but, as a side effect from this, the model saving code got much 
 cleaner.
 
 **Lazy attributes, prefetch_related and the like**
 
 In django, the related attributes are lazy. If they have been prefetched 
 somehow, you get the cached values, otherwise the query is made. In vinyl, 
-lazy attributes are gone. For accessing the prefetched values you should use 
+lazy attributes are gone. The old-style access (with `await`, of course) 
+will always lead to a query:
+
+```python
+await obj.related_obj  # hits the database
+                       # will not be cached automatically
+```
+To get the prefetched values one should use 
 dictionary access:
 
 ```python
@@ -87,10 +100,26 @@ obj['related_obj']
 obj['related_set']
 ```
 
-Accessing the attribute will always make a query: `await obj.related_obj`. 
-The once queried object will not be cached automatically.
-
 Again, making the API more explicit is only a plus, in my opinion.
+
+**What is supported**
+
+Currently, almost all of django API is supported one way or another, 
+with a few exceptions:
+
+- no signals
+- no chunked fetching
+- autocommit is turned off
+
+I am thinking about making the rules of model inheritance more strict too, so as
+to only support the case where all models in the inheritance chain share 
+the same primary key. This would simplify the logic of CRUD operations (and 
+their bulk variants).
+
+Of the databases, **PostgreSql** amd **MySql/MariaDb** are supported. As in 
+django, the database support is provided by database backends, so can 
+be contributed easily.
+
 
 **Database drivers**
 
