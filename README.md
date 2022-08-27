@@ -98,7 +98,7 @@ To get the prefetched values one should use
 dictionary access:
 
 ```python
-obj = M.vinyl.prefetch_related('related_set').first()
+obj = await M.vinyl.prefetch_related('related_set').first()
 obj['related_set']
 ```
 
