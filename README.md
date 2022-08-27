@@ -16,7 +16,7 @@ Goals:
 
 The main entry point to the magic is the model manager, which you need to 
 add alongside 
-the relular one (`objects`, likely).
+the regular one (`objects`, likely).
 
 ```python
 class M(models.Model):
