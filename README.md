@@ -148,7 +148,8 @@ method. It turned out pretty easy to pre-evaluate a queryset, and then launch
 the usual procedure, reusing the compiler from the pre-evaluation step.
 
 Next, there is write access: CRUD operations and the like. These generally 
-execute some SQL, not being interested in the result. I mean, we need to know 
+execute some SQL, not being too much interested in the result. I mean, we 
+need to know 
 whether it was a success or not, but do not need to fetch the results, by 
 doing, for example, `cursor.fetchall()`. These operations can simply store all 
 the queries they need to make and then to execute them in deferred fashion.
