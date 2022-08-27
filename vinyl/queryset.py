@@ -75,6 +75,14 @@ class VinylQuerySet(QuerySet):
     def __await__(self):
         return self._await().__await__()
 
+    def __aiter__(self):
+        return self._aiter()
+
+    async def _aiter(self):
+        await self
+        for item in self._result_cache:
+            yield item
+
     async def _await(self):
         compiler = self.query.get_compiler(using=self.db)
         await compiler

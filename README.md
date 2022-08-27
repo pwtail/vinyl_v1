@@ -48,7 +48,7 @@ DATABASES = {
 Now you can try the magic:
 
 ```python
-await M.vinyl.all()
+await M.vinyl.all()  # async for also works
 ob = await M.vinyl.get()
 await ob.related_set.all()
 ob.related_obj = related_obj
