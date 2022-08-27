@@ -118,7 +118,7 @@ to only support the case where all models in the inheritance chain share
 the same primary key. This would simplify the logic of CRUD operations (and 
 their bulk variants).
 
-Of the databases, **PostgreSql** amd **MySql/MariaDb** are supported. I used 
+Of the databases, **PostgreSql** and **MySql/MariaDb** are supported. I used 
 the psycopg3 driver instead of the asyncpg, but I think, I will make some 
 benchmarks in the nearest future. 
 
@@ -134,7 +134,7 @@ well as the migrations.
 - psycopg or asyncpg?
 - Not to increase the scope
 
-**Bonus: how was this made possible?**
+**Bonus: how has this been made possible?**
 
 First of all, django turned out to be pretty extensible itself. Here I want to 
 mention database backends, compilers, ability to use a 
