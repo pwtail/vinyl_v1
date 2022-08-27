@@ -72,7 +72,7 @@ Out[1]: vinyl.model.M
 You can access the class of the vinyl model through `M.vinyl.model`, but 
 generally you don't have to. With vinyl, you do not directly instantiate the 
 models. When making a query, you get the instantiated objects already, and 
-for inserts you should use
+for the inserts you should use
 
 ```python
 obj = await M.vinyl.create(**kwargs)
