@@ -132,7 +132,7 @@ well as the migrations.
 - psycopg or asyncpg?
 - Not to increase the scope
 
-**How was this made possible?**
+**Bonus: how was this made possible?**
 
 First of all, django turned out to be pretty extensible itself. Here I want to 
 mention database backends, compilers, ability to use a 
