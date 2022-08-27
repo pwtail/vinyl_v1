@@ -130,4 +130,5 @@ well as the migrations.
 
 - moving to beta, adding tests
 - psycopg or asyncpg?
+- to not increase the scope
 
