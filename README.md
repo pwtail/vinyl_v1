@@ -2,7 +2,7 @@ The vinyl project (aka async django)
 ---------------
 *currently at alfa stage*
 
-The vinyl project is an initiative (unofficial though) to continue adding the 
+The vinyl project is an initiative (unofficial) to continue adding the 
 async support to django. The main task is porting the **django orm** - the main 
 remaining obstacle in the way.
 
@@ -10,8 +10,6 @@ Goals:
 - async-only (native asynchrony)
 - be compatible with django models, not break existing code
 - be close to classic django in terms of API
-
-
 
 **A model manager**
 
@@ -55,7 +53,7 @@ ob.related_obj = related_obj
 await ob.save()
 ```
 
-`M.objects.all()` will keep working, of course, like the rest of django.
+`M.objects.all()` will keep working, like the rest of django.
 
 **Model instances (aka the objects). How to do an insert**
 
@@ -79,10 +77,22 @@ cleaner.
 
 **Lazy attributes, prefetch_related and the like**
 
-**d**
+In django, the related attributes are lazy. If they have been prefetched 
+somehow, you get the cached values, otherwise the query is made. In vinyl, 
+lazy attributes are gone. For accessing the prefetched values you should use 
+dictionary access:
 
-**Database support**
+```python
+obj['related_obj']
+obj['related_set']
+```
+
+Accessing the attribute will always make a query: `await obj.related_obj`. 
+The once queried object will not be cached automatically.
+
+Again, making the API more explicit is only a plus, in my opinion.
+
+**Database drivers**
 
 **Plans, directions**
 
-**Status: alfa**
