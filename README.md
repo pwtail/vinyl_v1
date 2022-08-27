@@ -55,7 +55,7 @@ await ob.save()
 
 `M.objects.all()` will keep working, like the rest of django.
 
-**Model instances (aka the objects). How to do an insert**
+**Model instances (aka the objects). Insert and update separated**
 
 Like django itself, vinyl builds a lot of its API around the model 
 instances (CRUD operations, related attributes, etc). But since the API is 
