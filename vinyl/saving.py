@@ -3,7 +3,7 @@ from django.db import router
 from vinyl import deferred
 
 
-class SaveMixin:
+class InsertMixin:
 
     async def _insert_table(self, cls, using=None):
         meta = cls._meta

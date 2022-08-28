@@ -6,7 +6,7 @@ from django.db.models.base import ModelBase
 from django.db.models.query_utils import DeferredAttribute
 
 from vinyl import deferred
-from vinyl.saving import SaveMixin
+from vinyl.saving import InsertMixin
 
 
 class VinylMetaD:
@@ -32,7 +32,8 @@ class ModelPlus(Model, metaclass=SkipModelBase):
         return True
 
 
-class VinylModel(SaveMixin, ModelPlus, metaclass=SkipModelBase):
+class VinylModel(InsertMixin, ModelPlus, metaclass=SkipModelBase):
+    # TODO move to deferred mixin
     _model = None
     _meta = VinylMetaD()
 
