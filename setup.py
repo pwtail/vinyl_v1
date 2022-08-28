@@ -12,12 +12,12 @@ classifiers = [
 with open("README.md", "r") as fp:
     README = fp.read()
 
-setup(name="vinyl",
+setup(name="vinylproject",
       version="0.1.0",
       author="Vitalii Abetkin",
       author_email="abvit89s@gmail.ru",
       packages=find_packages(),
-      description="vinyl style",
-      long_description=README,
+      description="vinyl",
+      long_description="vinyl",
       license="MIT",
       classifiers=classifiers)
