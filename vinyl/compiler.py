@@ -176,7 +176,7 @@ class SQLInsertCompiler(_compiler.SQLInsertCompiler):
         return self.async_execute_sql
 
 
-class SQLDeleteCompiler(_compiler.SQLDeleteCompiler):
+class SQLDeleteCompiler(DeferredCompilerMixin, _compiler.SQLDeleteCompiler):
 
     def execute_sql(self, result_type, **kw):
         sql, params = self.as_sql()

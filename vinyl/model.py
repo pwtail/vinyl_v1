@@ -36,7 +36,7 @@ class VinylModel(SaveMixin, ModelPlus, metaclass=SkipModelBase):
     _model = None
     _meta = VinylMetaD()
 
-    #TODO __init__?
+    #TODO is it used?
     def __new__(cls, *args, **kwargs):
         ob = cls._model(*args, **kwargs)
         ob._prefetch_cache = {}
@@ -49,7 +49,7 @@ class VinylModel(SaveMixin, ModelPlus, metaclass=SkipModelBase):
         return self._state.fields_cache[item]
 
     @asynccontextmanager
-    async def deferred(self):
+    async def _deferred(self):
         async with deferred.driver():
             cls = self.__class__
             self.__class__ = self._model
@@ -58,23 +58,26 @@ class VinylModel(SaveMixin, ModelPlus, metaclass=SkipModelBase):
             finally:
                 self.__class__ = cls
 
+    def get_vinyl_db(self, using):
+        using = using or router.db_for_write(self.__class__, instance=self)
+        if not using.startswith('vinyl_'):
+            return f'vinyl_{using}'
+
     async def save(self, using=None, update_fields=None):
         """
         Always do an update
         """
-        #TODO
-        using = using or router.db_for_write(self.__class__, instance=self)
-        if not using.startswith('vinyl_'):
-            using = f'vinyl_{using}'
-        async with self.deferred():
+        using = self.get_vinyl_db(using)
+        async with self._deferred():
             Model.save(self, force_update=True, using=using, update_fields=update_fields)
 
     async def delete(self, using=None, keep_parents=False):
-        async with self.deferred():
-            super().delete(using=using, keep_parents=keep_parents)
+        using = self.get_vinyl_db(using)
+        async with self._deferred():
+            Model.delete(self, using=using, keep_parents=keep_parents)
 
     @classmethod
-    def make(cls, model):
+    def inherit(cls, model):
         if hasattr(model, 'vinyl_model'):
             return model.vinyl_model
         ns = cls._copy_namespace(model)

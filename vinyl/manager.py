@@ -30,7 +30,7 @@ class VinylManagerDescriptor(ManagerDescriptor):
         return self.manager
 
     def create_model(self, django_model, *args, **kw):
-        self.manager.model = VinylModel.make(django_model)
+        self.manager.model = VinylModel.inherit(django_model)
 
     def __set_name__(self, owner, name):
         assert issubclass(owner, models.Model)
