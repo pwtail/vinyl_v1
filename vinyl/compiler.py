@@ -107,7 +107,6 @@ class SQLCompiler(ExecuteMixin, _compiler.SQLCompiler):
 
 class DeferredCompilerMixin(StatementsMixin):
     def execute_sql(self, result_type, **kw):
-        # print(result_type)
         try:
             sql, params = self.as_sql()
         except EmptyResultSet:
@@ -123,9 +122,9 @@ class SQLInsertCompiler(_compiler.SQLInsertCompiler):
 
     async def async_execute_sql(self, returning_fields=None):
         assert not (
-                returning_fields
-                and len(self.query.objs) != 1
-                and not self.connection.features.can_return_rows_from_bulk_insert
+            returning_fields
+            and len(self.query.objs) != 1
+            and not self.connection.features.can_return_rows_from_bulk_insert
         )
         opts = self.query.get_meta()
         self.returning_fields = returning_fields

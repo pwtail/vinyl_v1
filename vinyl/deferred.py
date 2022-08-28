@@ -12,32 +12,22 @@ from vinyl import patches
 statements = ContextVar('statements')
 
 
-
-class Statement(typing.NamedTuple):
-    sql: str
-    params: tuple
-    using: str
-
-
-class StatementsDeque(deque):
+class StatementsList(list):
     using = None
-
-    def __bool__(self):
-        return super().__bool__()
 
 
 @asynccontextmanager
 async def driver():
-    token = statements.set(value := StatementsDeque())
+    token = statements.set(value := StatementsList())
     try:
         with patches.apply():
             yield value
+        if not value:
+            return
         connection = connections[value.using]
         async with connection.transaction():
             for sql, params in value:
                 await connection.execute_only(sql, params)
     finally:
-        if value:
-            print('not all statements did execute')
         statements.reset(token)
 

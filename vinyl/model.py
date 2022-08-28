@@ -62,6 +62,10 @@ class VinylModel(SaveMixin, ModelPlus, metaclass=SkipModelBase):
         """
         Always do an update
         """
+        #TODO
+        using = using or router.db_for_write(self.__class__, instance=self)
+        if not using.startswith('vinyl_'):
+            using = f'vinyl_{using}'
         async with self.deferred():
             Model.save(self, force_update=True, using=using, update_fields=update_fields)
 
