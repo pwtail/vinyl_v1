@@ -1,7 +1,5 @@
 from django.db import router
 
-from vinyl import deferred
-
 
 class InsertMixin:
 

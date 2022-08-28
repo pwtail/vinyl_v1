@@ -17,7 +17,7 @@ class FKDescriptor:
         return self.wrapped.__set__(instance, value)
 
     def __get__(self, instance, owner):
-        django_model = owner._model
+        django_model = owner._deferred_model
         attr = getattr(django_model, self.name)
         if instance is None:
             return attr.__get__(None, django_model)
@@ -36,14 +36,12 @@ class RelatedManagerDescriptor:
         return self.wrapped.__set__(instance, value)
 
     def __get__(self, instance, owner):
-        django_model = owner._model
+        django_model = owner._deferred_model
         attr = getattr(django_model, self.name)
         if instance is None:
             return attr.__get__(None, django_model)
         manager = attr.__get__(instance, owner)
-        # manager.__class__ = wrap_related_manager(manager.__class__)
         if wrapper := getattr(manager, 'vinyl_wrapper', None):
-            #???
             return wrapper
         if (field := getattr(manager, 'field', None)) and isinstance(field, ForeignKey):
             manager_cls = ReverseManyToOneManager
@@ -60,7 +58,6 @@ class RelatedManagerWrapper:
     def __init__(self, manager):
         self.rel_mgr = manager
 
-    #TODO ???
     def __getattr__(self, item):
         return getattr(self.rel_mgr, item)
 

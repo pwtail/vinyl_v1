@@ -16,3 +16,9 @@ mark methods that contain I/O
 -----
 
 rename connection
+
+--------
+
+model: do not inherit, wrap
+
+------

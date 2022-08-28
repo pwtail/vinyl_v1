@@ -1,3 +1,10 @@
+"""
+These patches are actually harmless
+
+They are applied only in async context if the deferred execution is on
+And when applied, they turn off transactions and signals
+"""
+
 from contextlib import contextmanager
 
 from django.db.transaction import Atomic

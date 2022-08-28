@@ -1,6 +1,3 @@
-import threading
-import typing
-from collections import deque
 from contextlib import asynccontextmanager
 from contextvars import ContextVar
 
@@ -17,11 +14,10 @@ class StatementsList(list):
 
 
 @asynccontextmanager
-async def driver():
+async def execute_statements():
     token = statements.set(value := StatementsList())
     try:
-        with patches.apply():
-            yield value
+        yield value
         if not value:
             return
         connection = connections[value.using]
@@ -31,4 +27,16 @@ async def driver():
     finally:
         statements.reset(token)
 
-#TODO deferred mixin
+
+class DeferredMixin:
+
+    @asynccontextmanager
+    async def _deferred(self):
+        async with execute_statements():
+            cls = self.__class__
+            self.__class__ = self._deferred_model
+            try:
+                with patches.apply():
+                    yield
+            finally:
+                self.__class__ = cls

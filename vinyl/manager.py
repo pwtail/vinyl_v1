@@ -3,7 +3,7 @@ from django.db import models
 from django.db.models.manager import BaseManager, ManagerDescriptor
 from django.dispatch import Signal
 
-from vinyl.model import VinylModel
+from vinyl.meta import make_vinyl_model
 from vinyl.queryset import VinylQuerySet
 
 init_models = Signal()
@@ -30,7 +30,7 @@ class VinylManagerDescriptor(ManagerDescriptor):
         return self.manager
 
     def create_model(self, django_model, *args, **kw):
-        self.manager.model = VinylModel.inherit(django_model)
+        self.manager.model = make_vinyl_model(django_model)
 
     def __set_name__(self, owner, name):
         assert issubclass(owner, models.Model)
