@@ -20,23 +20,38 @@ class ExecuteMixin(StatementsMixin, _compiler.SQLCompiler):
     results = None
 
     def __await__(self):
-        return self._await().__await__()
+        return self.__Await__().__await__()
+
+    async def __Await__(self):
+        self.results = await(self._execute_sql())
+        self.query.get_compiler = lambda *args, **kw: self
+        return self.results
+
+    def execute_sql(self, result_type=MULTI, **kw):
+        assert self.results is not None
+        return self.results
+
+    def execute_sql(self, result_type=MULTI, **kw):
+        assert self.results is not None
+        return self.results
+
+    async def _execute_sql(self, result_type=MULTI):
+        assert result_type == MULTI
+        try:
+            sql, params = self.as_sql()
+            if not sql:
+                raise EmptyResultSet
+        except EmptyResultSet:
+            return iter([])
+        return await connections[self.using].execute_sql(sql, params)
 
     async def has_results(self):
-        results = await self.async_execute_sql()
+        results = await self._execute_sql()
         # results = tuple(chain.from_iterable(results))
         return bool(results[0])
 
-    async def _await(self):
-        self.results = await self.async_execute_sql()
-        self.query.get_compiler = lambda *args, **kw: self
-        # self.query.pre_evaluated = QueryResult(compiler=self, results=results)
-        return self.results
-
-    # def execute_multi
-
     async def explain_query(self):
-        result = list(await self.async_execute_sql())
+        result = list(await self._execute_sql())
         # Some backends return 1 item tuples with strings, and others return
         # tuples with integers and strings. Flatten them out into strings.
         format_ = self.query.explain_info.format
@@ -50,62 +65,13 @@ class ExecuteMixin(StatementsMixin, _compiler.SQLCompiler):
         #TODO pprint
         return '\n'.join(rows)
 
-    def execute_sql(self, result_type=MULTI, **kw):
-        if self.results is not None:
-            return self.results
-            # TODO del for assertion
-        sql, params = self.as_sql()
-        self.add_statement(sql, params)
-
-    async def async_execute_sql(self, result_type=MULTI):
-        assert result_type == MULTI
-        try:
-            sql, params = self.as_sql()
-            if not sql:
-                raise EmptyResultSet
-        except EmptyResultSet:
-            return iter([])
-        return await connections[self.using].execute_sql(sql, params)
-        #
-        #
-        # #TODO use pool
-        # import psycopg
-        # async with await psycopg.AsyncConnection.connect(
-        #         "dbname=lulka user=postgres"
-        # ) as aconn:
-        #     async with aconn.cursor() as cursor:
-        #         await cursor.execute(sql, params)
-        #         if result_type == SINGLE:
-        #             val = await cursor.fetchone()
-        #             if val:
-        #                 return val[0:self.col_count]
-        #             return val
-        #         elif result_type == MULTI:
-        #             results = await cursor.fetchall()
-        #             return (results,)
-        #         elif result_type == CURSOR:
-        #             assert False
-        #             return RetCursor(cursor.rowcount, getattr(cursor, 'lastrowid', None))
-
-
 class SQLCompiler(ExecuteMixin, _compiler.SQLCompiler):
-    #
-    # def results_iter(
-    #     self,
-    #     results=None,
-    #     tuple_expected=False,
-    #     chunked_fetch=False,
-    #     chunk_size=GET_ITERATOR_CHUNK_SIZE,
-    # ):
-    #     """Return an iterator over the results from executing this query."""
-    #     assert results is not None
-    #     #TODO or tl
-    #     return super().results_iter(results=results, tuple_expected=tuple_expected)
-    #
-    1
+    pass
+
 
 class DeferredCompilerMixin(StatementsMixin):
     def execute_sql(self, result_type, **kw):
+        assert result_type != MULTI
         try:
             sql, params = self.as_sql()
         except EmptyResultSet:
@@ -119,7 +85,7 @@ class SQLUpdateCompiler(DeferredCompilerMixin, _compiler.SQLUpdateCompiler):
 
 class SQLInsertCompiler(_compiler.SQLInsertCompiler):
 
-    async def async_execute_sql(self, returning_fields=None):
+    async def _execute_sql(self, returning_fields=None):
         assert not (
             returning_fields
             and len(self.query.objs) != 1

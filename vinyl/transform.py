@@ -18,6 +18,7 @@ def replace(line):
         line = re.sub(src, repl, line)
     return line
 
+
 if __name__ == '__main__':
     fpath = sys.argv[1]
     lines = []
