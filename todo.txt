@@ -19,7 +19,6 @@ rename connection
 
 --------
 
-~~model: do not inherit, wrap~~
 query: is cloned automatically, just change the class
 
 ? eval without modifying the qs?

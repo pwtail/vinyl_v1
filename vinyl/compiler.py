@@ -59,7 +59,6 @@ class ExecuteMixin(StatementsMixin, _compiler.SQLCompiler):
 
     async def async_execute_sql(self, result_type=MULTI):
         assert result_type == MULTI
-        # result_type = result_type or NO_RESULTS
         try:
             sql, params = self.as_sql()
             if not sql:

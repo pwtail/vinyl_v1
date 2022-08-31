@@ -1,6 +1,8 @@
 from contextlib import asynccontextmanager, contextmanager
 from contextvars import ContextVar
 
+from vinyl.flags import is_async
+
 
 @contextmanager
 def no_op():
@@ -13,24 +15,26 @@ class VinylConnectionMixin:
 
     CursorWrapper = None
 
-    @asynccontextmanager
-    async def cursor(self):
-        if (conn := self.async_connection.get()) is not None:
-            async with conn.cursor() as cur:
-                if self.CursorWrapper:
-                    cur = self.CursorWrapper(cur)
-                yield cur
-            return
-        async with self.get_connection_from_pool() as conn:
-            token = self.async_connection.set(conn)
-            try:
+    if is_async():
+        @asynccontextmanager
+        async def cursor(self):
+            if (conn := self.async_connection.get()) is not None:
                 async with conn.cursor() as cur:
                     if self.CursorWrapper:
                         cur = self.CursorWrapper(cur)
                     yield cur
-            finally:
-                self.async_connection.reset(token)
+                return
+            async with self.get_connection_from_pool() as conn:
+                token = self.async_connection.set(conn)
+                try:
+                    async with conn.cursor() as cur:
+                        if self.CursorWrapper:
+                            cur = self.CursorWrapper(cur)
+                        yield cur
+                finally:
+                    self.async_connection.reset(token)
 
+    #TODO add sync version too
     def transaction(self):
         if self.async_connection.get():
             return no_op()
@@ -50,7 +54,7 @@ class VinylConnectionMixin:
         async with self.cursor() as cursor:
             await cursor.execute(sql, params)
             results = await cursor.fetchall()
-            return (results,)  # FIXME
+            return (results,)
 
     async def execute_only(self, sql, params):
         """
