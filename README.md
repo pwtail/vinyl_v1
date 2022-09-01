@@ -8,7 +8,7 @@ To test you currently have to call `init_models` signal after the models have be
 
 ```python
 from django.apps import AppConfig
-from vinyl import init_models
+from vinyl.manager import init_models
 
 class MyAppConfig(AppConfig):
 
