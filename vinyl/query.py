@@ -123,7 +123,7 @@ class VinylQuery(Query):
         outer_query.select_for_update = False
         outer_query.select_related = False
         compiler = outer_query.get_compiler(using, elide_empty=elide_empty)
-        await compiler
+        await(compiler)
         # result = compiler.execute_sql(SINGLE)
         results = compiler.execute_sql(MULTI)
         rows = chain.from_iterable(results)

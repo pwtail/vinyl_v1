@@ -27,7 +27,7 @@ class VinylQuerySet(QuerySet):
         ):
             limit = MAX_GET_RESULTS
             clone.query.set_limits(high=limit)
-        await clone
+        await(clone)
         num = len(clone)
         if num == 1:
             return clone._result_cache[0]
@@ -78,7 +78,7 @@ class VinylQuerySet(QuerySet):
         return self._aiter()
 
     async def _aiter(self):
-        await self
+        await(self)
         for item in self._result_cache:
             yield item
 
@@ -133,7 +133,7 @@ class VinylQuerySet(QuerySet):
         else:
             self._check_ordering_first_last_queryset_aggregation(method="first")
             queryset = self.order_by("pk")
-        for obj in await queryset[:1]:
+        for obj in await(queryset[:1]):
             return obj
 
     #exact copy + await
@@ -144,7 +144,7 @@ class VinylQuerySet(QuerySet):
         else:
             self._check_ordering_first_last_queryset_aggregation(method="last")
             queryset = self.order_by("-pk")
-        for obj in await queryset[:1]:
+        for obj in await(queryset[:1]):
             return obj
 
     async def update(self, **kwargs):
