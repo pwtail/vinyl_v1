@@ -266,10 +266,7 @@ async def prefetch_one_level(instances, prefetcher, lookup, level):
         # for performance reasons.
         rel_qs._prefetch_related_lookups = ()
 
-    from vinyl.queryset import VinylQuerySet
-    # rel_qs.__class__ = VinylQuerySet
-    rel_qs = VinylQuerySet.clone(rel_qs)
-    all_related_objects = await rel_qs
+    all_related_objects = await(rel_qs)
 
     rel_obj_cache = {}
     for rel_obj in all_related_objects:

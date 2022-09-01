@@ -72,7 +72,7 @@ class VinylQuerySet(QuerySet):
         super().__init__(model=model, query=query, using=using, hints=hints)
 
     def __await__(self):
-        return self._await().__await__()
+        return self.__Await__().__await__()
 
     def __aiter__(self):
         return self._aiter()
@@ -82,9 +82,9 @@ class VinylQuerySet(QuerySet):
         for item in self._result_cache:
             yield item
 
-    async def _await(self):
+    async def __Await__(self):
         compiler = self.query.get_compiler(using=self.db)
-        await compiler
+        await(compiler)
         self._fetch_all()
         if self._prefetch_related_lookups and not self._prefetch_done:
             await self._prefetch_related_objects()
@@ -185,11 +185,3 @@ class VinylQuerySet(QuerySet):
         self._for_write = True
         await obj.insert(using=self.db)
         return obj
-
-
-#
-
-
-def eval_qs(qs):
-    1
-    # plan
