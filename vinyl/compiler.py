@@ -23,7 +23,7 @@ class ExecuteMixin(StatementsMixin, _compiler.SQLCompiler):
         return self.__Await__().__await__()
 
     async def __Await__(self):
-        self.results = await(self._execute_sql())
+        self.results = await self._execute_sql()
         self.query.get_compiler = lambda *args, **kw: self
         return self.results
 
