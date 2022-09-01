@@ -136,6 +136,7 @@ class SQLInsertCompiler(_compiler.SQLInsertCompiler):
 
     @property
     def execute_sql(self):
+        #TODO tl *name*
         if statements.get(None) is not None:
             return self.sync_execute_sql
         return self.async_execute_sql

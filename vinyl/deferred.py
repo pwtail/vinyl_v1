@@ -1,4 +1,5 @@
-from contextlib import asynccontextmanager
+import threading
+from contextlib import asynccontextmanager, contextmanager
 from contextvars import ContextVar
 
 from django.db import connections
@@ -26,6 +27,20 @@ async def execute_statements():
                 await connection.execute_only(sql, params)
     finally:
         statements.reset(token)
+
+tl = threading.local()
+tl.collected_sql = None
+
+@contextmanager
+def collect_sql():
+    tl.collected_sql = value = StatementsList()
+    try:
+        yield value
+    finally:
+        tl.collected_sql = ()
+
+# is collecting sql
+# get collected sql
 
 
 class DeferredMixin:

@@ -125,50 +125,6 @@ class VinylQuerySet(QuerySet):
         instance = self.model(**kwargs)
         await instance.insert(using=using)
 
-    # async def bulk_create(
-    #     self,
-    #     objs,
-    #     batch_size=None,
-    #     ignore_conflicts=False,
-    #     update_conflicts=False,
-    #     update_fields=None,
-    #     unique_fields=None,
-    # ):
-    #     async with deferred.driver():
-    #         super().bulk_create(
-    #             objs=objs,
-    #             batch_size=batch_size,
-    #             ignore_conflicts=ignore_conflicts,
-    #             update_conflicts=update_conflicts,
-    #             update_fields=update_fields,
-    #             unique_fields=unique_fields,
-    #         )
-
-    # def get_or_create(self, defaults=None, **kwargs):
-    #     """
-    #     Look up an object with the given kwargs, creating one if necessary.
-    #     Return a tuple of (object, created), where created is a boolean
-    #     specifying whether an object was created.
-    #     """
-    #     # The get() needs to be targeted at the write database in order
-    #     # to avoid potential transaction consistency problems.
-    #     self._for_write = True
-    #     try:
-    #         return self.get(**kwargs), False
-    #     except self.model.DoesNotExist:
-    #         params = self._extract_model_params(defaults, **kwargs)
-    #         # Try to create an object using passed params.
-    #         try:
-    #             with transaction.atomic(using=self.db):
-    #                 params = dict(resolve_callables(params))
-    #                 return self.create(**params), True
-    #         except IntegrityError:
-    #             try:
-    #                 return self.get(**kwargs), False
-    #             except self.model.DoesNotExist:
-    #                 pass
-    #             raise
-
     #exact copy + await
     async def first(self):
         """Return the first object of a query or None if no match is found."""
@@ -229,3 +185,11 @@ class VinylQuerySet(QuerySet):
         self._for_write = True
         await obj.insert(using=self.db)
         return obj
+
+
+#
+
+
+def eval_qs(qs):
+    1
+    # plan
