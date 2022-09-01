@@ -37,7 +37,7 @@ class VinylManagerDescriptor(ManagerDescriptor):
         self.manager.name = name
         self.django_model = owner
         create_model = lambda *args, **kw: self.create_model(owner, *args, **kw)
-        init_models.connect(create_model, sender=AppConfig)
+        init_models.connect(create_model, sender=Signal)
 
 
 VinylManager = VinylManagerDescriptor
