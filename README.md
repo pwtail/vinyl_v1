@@ -2,6 +2,21 @@ The vinyl project (aka async django)
 ---------------
 *currently at alfa stage*
 
+**How to test**
+
+To test you currently have to call `init_model` signals after the models have been initialized. For example:
+
+```python
+from django.apps import AppConfig
+from vinyl import init_models
+
+class MyAppConfig(AppConfig):
+
+  def ready(self):
+    init_models.send(AppConfig)
+```
+
+
 The vinyl project is an (unofficial) initiative to continue adding the 
 async support to django. The main task was the porting of **django orm** - the 
 main 
