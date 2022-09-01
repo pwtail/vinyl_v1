@@ -4,7 +4,7 @@ The vinyl project (aka async django)
 
 **How to test**
 
-To test you currently have to call `init_model` signals after the models have been initialized. For example:
+To test you currently have to call `init_model` signal after the models have been initialized. For example:
 
 ```python
 from django.apps import AppConfig
