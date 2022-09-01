@@ -15,7 +15,7 @@ class MyAppConfig(AppConfig):
   def ready(self):
     init_models.send(AppConfig)
 ```
-
+--------------------------
 
 The vinyl project is an (unofficial) initiative to continue adding the 
 async support to django. The main task was the porting of **django orm** - the 
