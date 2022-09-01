@@ -1,4 +1,4 @@
-IS_ASYNC = False
+IS_ASYNC = True
 
 
 def is_async():

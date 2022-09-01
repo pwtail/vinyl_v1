@@ -10,8 +10,6 @@ from contextlib import contextmanager
 from django.db.transaction import Atomic
 from django.dispatch import Signal
 
-from vinyl.deferred import statements
-
 
 @contextmanager
 def no_op():
@@ -21,6 +19,7 @@ def no_op():
 class AtomicPatch:
 
     def __new__(cls, *args, **kwargs):
+        from vinyl.deferred import statements
         if statements.get(None) is not None:
             return no_op()
         return super().__new__(cls)
@@ -29,11 +28,13 @@ class AtomicPatch:
 class SignalPatch:
 
     def send(*args, **kwargs):
+        from vinyl.deferred import statements
         if statements.get(None) is not None:
             return
         return Signal.send(*args, **kwargs)
 
     def send_robust(*args, **kwargs):
+        from vinyl.deferred import statements
         if statements.get(None) is not None:
             return
         return Signal.send_robust(*args, **kwargs)
@@ -53,3 +54,30 @@ def apply():
         Atomic.__new__ = Atomic__new__
         Signal.send = Signal_send
         Signal.send_robust = Signal_send_robust
+
+
+class ModelReadyDescriptor:
+
+    def __get__(self, instance, owner):
+        assert instance
+        return instance.__dict__['models_ready']
+
+    def __set__(self, instance, value):
+        assert instance
+        old_val = instance.__dict__.get('models_ready')
+        if old_val is False and value is True:
+            from vinyl.manager import init_models
+            init_models.send(Signal)
+        instance.__dict__['models_ready'] = value
+
+    def __set_name__(self, owner, name):
+        assert name == 'models_ready'
+
+
+from django.apps import apps
+from django.apps.registry import Apps
+
+class Apps(Apps):
+    models_ready = ModelReadyDescriptor()
+
+apps.__class__ = Apps
