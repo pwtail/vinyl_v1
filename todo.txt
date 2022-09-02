@@ -24,4 +24,11 @@ query: is cloned automatically, just change the class
 ? eval without modifying the qs?
 apply in async def set
 
+__aiter__ -> __iter__
+
 ------
+plan
+1.using
+2.deferred
+
+n.readme

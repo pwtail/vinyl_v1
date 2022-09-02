@@ -3,7 +3,8 @@ from django.db.models import QuerySet, Model
 from django.db.models.query import MAX_GET_RESULTS
 from django.db.models.utils import resolve_callables
 
-from vinyl import deferred
+from vinyl import deferred, iterables
+from vinyl.flags import is_async
 from vinyl.prefetch import prefetch_related_objects
 from vinyl.query import VinylQuery
 
@@ -83,16 +84,16 @@ class VinylQuerySet(QuerySet):
             yield item
 
     async def __Await__(self):
-        compiler = self.query.get_compiler(using=self.db)
-        await(compiler)
-        self._fetch_all()
+        if self._result_cache is None:
+            iterable_class = getattr(iterables, self._iterable_class.__name__)
+            self._result_cache = list(await(iterable_class(self)))
         if self._prefetch_related_lookups and not self._prefetch_done:
             await self._prefetch_related_objects()
         return self._result_cache
 
     def _fetch_all(self):
-        if self._result_cache is None:
-            self._result_cache = list(self._iterable_class(self))
+        if not is_async():
+            self.__Await__()
         # no prefetch related
 
     async def _prefetch_related_objects(self):

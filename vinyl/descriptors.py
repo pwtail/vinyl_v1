@@ -2,7 +2,7 @@ from django.db import router
 from django.db.models import ForeignKey
 from django.db.models.fields.related_descriptors import ForeignKeyDeferredAttribute
 
-from vinyl import deferred
+from vinyl import deferred, Await
 from vinyl.queryset import VinylQuerySet
 
 
@@ -90,8 +90,7 @@ class M2MManager(RelatedManagerWrapper):
         qs = self.using(db).values_list(
             self.target_field.target_field.attname, flat=True
         )
-        qs = VinylQuerySet.clone(qs)
-        old_ids = set(await qs)
+        old_ids = set(await Await(qs))
 
         new_objs = []
         for obj in objs:
@@ -120,7 +119,7 @@ class ReverseManyToOneManager(RelatedManagerWrapper):
         if self.field.null:
             db = router.db_for_write(self.model, instance=self.instance)
             old_objs = self.using(db).all()
-            old_objs = await VinylQuerySet.clone(old_objs)
+            old_objs = await Await(old_objs)
             new_objs = []
             for obj in objs:
                 if obj in old_objs:
