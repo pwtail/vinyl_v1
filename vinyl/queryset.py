@@ -103,13 +103,6 @@ class VinylQuerySet(QuerySet):
     def prefetch(self, *args, **kw):
         return self.prefetch_related(*args, **kw)
 
-    @property
-    def db(self):
-        db = super().db
-        if db.startswith('vinyl_'):
-            return db
-        return f'vinyl_{db}'
-
     async def get_or_none(self):
         try:
             return await self.get()

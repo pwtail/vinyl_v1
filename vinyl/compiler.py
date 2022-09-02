@@ -2,7 +2,7 @@ from django.db import connections
 from django.db.models.sql import compiler as _compiler
 from django.db.models.sql.compiler import *
 
-from vinyl.deferred import statements
+from vinyl.deferred import statements, is_collecting_sql
 
 
 class StatementsMixin:
@@ -15,7 +15,7 @@ class StatementsMixin:
         items.append(stmt)
 
 
-class ExecuteMixin(StatementsMixin, _compiler.SQLCompiler):
+class ExecuteMixin(_compiler.SQLCompiler):
 
     results = None
 
@@ -25,10 +25,6 @@ class ExecuteMixin(StatementsMixin, _compiler.SQLCompiler):
     async def __Await__(self):
         self.results = await self._execute_sql()
         self.query.get_compiler = lambda *args, **kw: self
-        return self.results
-
-    def execute_sql(self, result_type=MULTI, **kw):
-        assert self.results is not None
         return self.results
 
     def execute_sql(self, result_type=MULTI, **kw):
@@ -83,7 +79,7 @@ class SQLUpdateCompiler(DeferredCompilerMixin, _compiler.SQLUpdateCompiler):
     pass
 
 
-class SQLInsertCompiler(_compiler.SQLInsertCompiler):
+class SQLInsertCompiler(DeferredCompilerMixin, _compiler.SQLInsertCompiler):
 
     async def _execute_sql(self, returning_fields=None):
         assert not (
@@ -129,17 +125,16 @@ class SQLInsertCompiler(_compiler.SQLInsertCompiler):
             rows = list(self.apply_converters(rows, converters))
         return rows
 
-    def sync_execute_sql(self, returning_fields=None):
+    def _defer_execute_sql(self, returning_fields=None):
         assert not returning_fields
         for sql, params in self.as_sql():
             self.add_statement(sql, params)
 
     @property
     def execute_sql(self):
-        #TODO tl *name*
-        if statements.get(None) is not None:
-            return self.sync_execute_sql
-        return self.async_execute_sql
+        if is_collecting_sql():
+            return self._defer_execute_sql
+        return self._execute_sql
 
 
 class SQLDeleteCompiler(DeferredCompilerMixin, _compiler.SQLDeleteCompiler):

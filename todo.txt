@@ -28,7 +28,11 @@ __aiter__ -> __iter__
 
 ------
 plan
-1.using
-2.deferred
+1.test
 
 n.readme
+
+
+-----------
+asyncflag.py
+------------

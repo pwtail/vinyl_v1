@@ -14,19 +14,15 @@ class StatementsList(list):
     using = None
 
 
-@asynccontextmanager
-async def execute_statements():
-    token = statements.set(value := StatementsList())
-    try:
-        yield value
-        if not value:
-            return
-        connection = connections[value.using]
-        async with connection.transaction():
-            for sql, params in value:
-                await connection.execute_only(sql, params)
-    finally:
-        statements.reset(token)
+
+async def execute_statements(items):
+    if not items:
+        return
+    connection = connections[items.using]
+    async with connection.transaction():
+        for sql, params in items:
+            await connection.execute_only(sql, params)
+
 
 tl = threading.local()
 tl.collected_sql = None
@@ -35,23 +31,19 @@ tl.collected_sql = None
 def collect_sql():
     tl.collected_sql = value = StatementsList()
     try:
-        yield value
+        with patches.apply:
+            yield value
     finally:
-        tl.collected_sql = ()
+        tl.collected_sql = None
 
 # is collecting sql
 # get collected sql
 
+def is_collecting_sql():
+    return tl.collected_sql is not None
 
-class DeferredMixin:
 
-    @asynccontextmanager
-    async def _deferred(self):
-        async with execute_statements():
-            cls = self.__class__
-            self.__class__ = self._deferred_model
-            try:
-                with patches.apply():
-                    yield
-            finally:
-                self.__class__ = cls
+async def deferred():
+    with collect_sql() as items:
+        yield
+    await execute_statements(items)

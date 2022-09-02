@@ -19,10 +19,9 @@ class _VinylManager(BaseManager.from_queryset(VinylQuerySet)):
 class VinylManagerDescriptor(ManagerDescriptor):
     manager = None
 
-    def __init__(self, model=None):
-        self.manager = _VinylManager()
-        if model:
-            self.manager.model = model
+    def __init__(self, using='vinyl_default'):
+        self.manager = _VinylManager().using(using)
+
 
     def __get__(self, instance, owner):
         assert not instance

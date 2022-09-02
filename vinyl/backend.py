@@ -34,9 +34,8 @@ class VinylConnectionMixin:
                 finally:
                     self.async_connection.reset(token)
 
-    #TODO add sync version too
     def transaction(self):
-        if self.async_connection.get():
+        if not is_async() or self.async_connection.get():
             return no_op()
         return self.get_connection_from_pool()
 

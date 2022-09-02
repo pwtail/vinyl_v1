@@ -1,9 +1,12 @@
+from contextlib import asynccontextmanager
+
 from django.db import router
 from django.db.models import Model
 from django.db.models.base import ModelBase
 
-from vinyl.deferred import DeferredMixin
+from vinyl.deferred import deferred
 from vinyl.insert import InsertMixin
+from vinyl.util import set_class
 
 
 class VinylMetaD:
@@ -32,8 +35,7 @@ class DeferredModel(Model, metaclass=SkipModelBase):
         return True
 
 
-class VinylModel(InsertMixin, DeferredMixin,
-                 DeferredModel, metaclass=SkipModelBase):
+class VinylModel(InsertMixin, DeferredModel, metaclass=SkipModelBase):
     _deferred_model = None
     _meta = VinylMetaD()
 
@@ -49,20 +51,19 @@ class VinylModel(InsertMixin, DeferredMixin,
             return value
         return self._state.fields_cache[item]
 
-    def get_vinyl_db(self, using):
-        using = using or router.db_for_write(self.__class__, instance=self)
-        if not using.startswith('vinyl_'):
-            return f'vinyl_{using}'
+    @asynccontextmanager
+    def _deferred(self):
+        async with deferred():
+            with set_class(self, self._deferred_model):
+                yield
 
-    async def save(self, using=None, update_fields=None):
+    def save(self, update_fields=None):
         """
         Always do an update
         """
-        using = self.get_vinyl_db(using)
         async with self._deferred():
-            Model.save(self, force_update=True, using=using, update_fields=update_fields)
+            Model.save(self, force_update=True, update_fields=update_fields)
 
     async def delete(self, using=None, keep_parents=False):
-        using = self.get_vinyl_db(using)
         async with self._deferred():
             Model.delete(self, using=using, keep_parents=keep_parents)

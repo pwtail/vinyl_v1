@@ -12,6 +12,7 @@ def replace(line):
         (r'await\(', 'Await('),
         ('await ', ''),
         ('async ', ''),
+        ('asynccontextmanager', 'contextmanager'),
         #TODO think about async with, async for
     )
     for src, repl in substitutions:
