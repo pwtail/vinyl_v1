@@ -6,13 +6,9 @@ from django.db import connections
 
 from vinyl import patches
 
-# TODO rename?
-statements = ContextVar('statements')
-
 
 class StatementsList(list):
     using = None
-
 
 
 async def execute_statements(items):
@@ -31,7 +27,7 @@ tl.collected_sql = None
 def collect_sql():
     tl.collected_sql = value = StatementsList()
     try:
-        with patches.apply:
+        with patches.apply():
             yield value
     finally:
         tl.collected_sql = None
@@ -43,6 +39,7 @@ def is_collecting_sql():
     return tl.collected_sql is not None
 
 
+@asynccontextmanager
 async def deferred():
     with collect_sql() as items:
         yield

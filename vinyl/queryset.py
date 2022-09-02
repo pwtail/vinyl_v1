@@ -111,7 +111,7 @@ class VinylQuerySet(QuerySet):
 
     async def delete(self):
         # TODO model ??
-        await self
+        await(self)
         async with deferred.driver():
             super().delete()
 

@@ -46,18 +46,38 @@ class VinylConnectionMixin:
     async def get_connection_from_pool(self):
         raise NotImplementedError()
 
-    async def execute_sql(self, sql, params):
-        """
-        Execute and fetch multiple rows
-        """
-        async with self.cursor() as cursor:
-            await cursor.execute(sql, params)
-            results = await cursor.fetchall()
-            return (results,)
+    if is_async():
 
-    async def execute_only(self, sql, params):
-        """
-        Execute but do not fetch
-        """
-        async with self.cursor() as cursor:
-            await cursor.execute(sql, params)
+        async def execute_sql(self, sql, params):
+            """
+            Execute and fetch multiple rows
+            """
+            async with self.cursor() as cursor:
+                await cursor.execute(sql, params)
+                results = await cursor.fetchall()
+                return (results,)
+
+        async def execute_only(self, sql, params):
+            """
+            Execute but do not fetch
+            """
+            async with self.cursor() as cursor:
+                await cursor.execute(sql, params)
+
+    else:
+
+        def execute_sql(self, sql, params):
+            """
+            Execute and fetch multiple rows
+            """
+            with self.cursor() as cursor:
+                cursor.execute(sql, params)
+                results = cursor.fetchall()
+                return (results,)
+
+        def execute_only(self, sql, params):
+            """
+            Execute but do not fetch
+            """
+            with self.cursor() as cursor:
+                cursor.execute(sql, params)

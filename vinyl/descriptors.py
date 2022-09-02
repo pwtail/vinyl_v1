@@ -1,8 +1,8 @@
 from django.db import router
 from django.db.models import ForeignKey
-from django.db.models.fields.related_descriptors import ForeignKeyDeferredAttribute
 
-from vinyl import deferred, Await
+from vinyl import Await
+from vinyl.deferred import deferred
 from vinyl.queryset import VinylQuerySet
 
 
@@ -62,15 +62,15 @@ class RelatedManagerWrapper:
         return getattr(self.rel_mgr, item)
 
     async def add(self, *args, **kw):
-        async with deferred.driver():
+        async with deferred():
             self.rel_mgr.add(*args, **kw)
 
     async def remove(self, *args, **kw):
-        async with deferred.driver():
+        async with deferred():
             self.rel_mgr.remove(*args, **kw)
 
     async def clear(self, *args, **kw):
-        async with deferred.driver():
+        async with deferred():
             self.rel_mgr.clear(*args, **kw)
 
     def all(self):

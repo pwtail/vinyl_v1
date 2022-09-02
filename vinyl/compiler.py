@@ -2,12 +2,13 @@ from django.db import connections
 from django.db.models.sql import compiler as _compiler
 from django.db.models.sql.compiler import *
 
-from vinyl.deferred import statements, is_collecting_sql
+from vinyl.deferred import is_collecting_sql, tl
 
 
 class StatementsMixin:
     def add_statement(self, *stmt):
-        items = statements.get()
+        #FIXME
+        assert (items := tl.collected_sql) is not None
         if not items:
             items.using = self.using
         else:

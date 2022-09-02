@@ -48,7 +48,7 @@ class InsertMixin:
         using = using or router.db_for_write(self.__class__, instance=self)
         if not using.startswith('vinyl_'):
             using = f'vinyl_{using}'
-        cls = self._model
+        cls = self._deferred_model
         # Skip proxies, but keep the origin as the proxy model.
         if cls._meta.proxy:
             cls = cls._meta.concrete_model
@@ -58,4 +58,4 @@ class InsertMixin:
         if meta.parents:
             await self._insert_parents(cls=cls, using=using)
         await self._insert_table(cls=cls, using=using)
-
+        return self

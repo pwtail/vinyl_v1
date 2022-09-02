@@ -19,8 +19,8 @@ def no_op():
 class AtomicPatch:
 
     def __new__(cls, *args, **kwargs):
-        from vinyl.deferred import statements
-        if statements.get(None) is not None:
+        from vinyl.deferred import is_collecting_sql
+        if is_collecting_sql():
             return no_op()
         return super().__new__(cls)
 
@@ -28,16 +28,17 @@ class AtomicPatch:
 class SignalPatch:
 
     def send(*args, **kwargs):
-        from vinyl.deferred import statements
-        if statements.get(None) is not None:
+        from vinyl.deferred import is_collecting_sql
+        if is_collecting_sql():
             return
         return Signal.send(*args, **kwargs)
 
     def send_robust(*args, **kwargs):
-        from vinyl.deferred import statements
-        if statements.get(None) is not None:
+        from vinyl.deferred import is_collecting_sql
+        if is_collecting_sql():
             return
         return Signal.send_robust(*args, **kwargs)
+
 
 
 @contextmanager

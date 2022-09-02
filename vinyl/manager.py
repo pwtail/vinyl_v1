@@ -15,12 +15,16 @@ class _VinylManager(BaseManager.from_queryset(VinylQuerySet)):
     """
     model = None
 
+    def __init__(self, using='vinyl_default'):
+        super().__init__()
+        self._db = using
+
 
 class VinylManagerDescriptor(ManagerDescriptor):
     manager = None
 
-    def __init__(self, using='vinyl_default'):
-        self.manager = _VinylManager().using(using)
+    def __init__(self):
+        self.manager = _VinylManager()
 
 
     def __get__(self, instance, owner):
