@@ -29,10 +29,12 @@ __aiter__ -> __iter__
 ------
 plan
 1.test
+(all ported?)
 
 n.readme
 
 
------------
-asyncflag.py
 ------------
+
+clone
+backend (make symmetric)
