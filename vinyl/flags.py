@@ -1,12 +1,11 @@
-try:
-    import asyncflag
-except ImportError:
-    IS_ASYNC = False
-else:
-    IS_ASYNC = True
+import inspect
+
+
+async def hi_there():
+    pass
 
 
 def is_async():
-    return IS_ASYNC
+    return inspect.iscoroutinefunction(hi_there)
 
 

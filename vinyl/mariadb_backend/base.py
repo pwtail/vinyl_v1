@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager, contextmanager
 import aiomysql
 from django.db.backends.mysql.base import DatabaseWrapper as _DatabaseWrapper
 
-from vinyl.backend import VinylConnectionMixin
+from vinyl.backend_impl import VinylConnectionMixin
 from vinyl.mariadb_backend.ops import DatabaseOperations
 
 

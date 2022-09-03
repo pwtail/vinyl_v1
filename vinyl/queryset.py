@@ -3,7 +3,8 @@ from django.db.models import QuerySet, Model
 from django.db.models.query import MAX_GET_RESULTS
 from django.db.models.utils import resolve_callables
 
-from vinyl import deferred, iterables
+from vinyl.deferred import deferred
+from vinyl import iterables
 from vinyl.flags import is_async
 from vinyl.prefetch import prefetch_related_objects
 from vinyl.query import VinylQuery
@@ -46,6 +47,7 @@ class VinylQuerySet(QuerySet):
 
     @classmethod
     def clone(cls, qs):
+        #FIXME
         query = VinylQuery.convert(qs.query)
         c = cls(
             model=query.model,
@@ -112,7 +114,7 @@ class VinylQuerySet(QuerySet):
     async def delete(self):
         # TODO model ??
         await(self)
-        async with deferred.driver():
+        async with deferred():
             super().delete()
 
     async def insert(self, using=None, **kwargs):
@@ -142,7 +144,7 @@ class VinylQuerySet(QuerySet):
             return obj
 
     async def update(self, **kwargs):
-        async with deferred.driver():
+        async with deferred():
             super().update(**kwargs)
 
     #TODO transaction

@@ -52,12 +52,12 @@ class VinylModel(InsertMixin, DeferredModel, metaclass=SkipModelBase):
         return self._state.fields_cache[item]
 
     @asynccontextmanager
-    def _deferred(self):
+    async def _deferred(self):
         async with deferred():
             with set_class(self, self._deferred_model):
                 yield
 
-    def save(self, update_fields=None):
+    async def save(self, update_fields=None):
         """
         Always do an update
         """
