@@ -58,4 +58,3 @@ class InsertMixin:
         if meta.parents:
             await self._insert_parents(cls=cls, using=using)
         await self._insert_table(cls=cls, using=using)
-        return self

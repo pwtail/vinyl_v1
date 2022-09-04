@@ -120,6 +120,7 @@ class VinylQuerySet(QuerySet):
     async def insert(self, using=None, **kwargs):
         instance = self.model(**kwargs)
         await instance.insert(using=using)
+        return instance
 
     #exact copy + await
     async def first(self):
