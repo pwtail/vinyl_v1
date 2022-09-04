@@ -1,4 +1,4 @@
-# pragma: I/O specific
+# pragma: i/o specific
 from contextlib import contextmanager
 from contextvars import ContextVar
 

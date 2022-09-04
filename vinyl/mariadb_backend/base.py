@@ -4,7 +4,7 @@ import aiomysql
 from django.db.backends.mysql.base import DatabaseWrapper as _DatabaseWrapper
 
 from vinyl.backend_impl import VinylConnectionMixin
-from mariadb_backend.ops import DatabaseOperations
+from vinyl.mariadb_backend.ops import DatabaseOperations
 
 
 class DatabaseWrapper(VinylConnectionMixin, _DatabaseWrapper):

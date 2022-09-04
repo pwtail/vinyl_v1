@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from django.core.exceptions import ImproperlyConfigured
 
 from vinyl.backend import Backend
-from postgresql_backend.ops import DatabaseOperations
+from vinyl.postgresql_backend.ops import DatabaseOperations
 
 
 class PgBackend(Backend):
@@ -36,6 +36,7 @@ class PgBackend(Backend):
         conn_params = self.get_connection_params()
         dsn = self._to_dsn(**conn_params)
         pool = self.make_pool(dsn)
+        await pool.open()
         self.pool = pool
         return pool
 

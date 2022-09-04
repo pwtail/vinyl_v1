@@ -1,8 +1,9 @@
+# pragma: i/o specific
 import psycopg_pool
 from django.db.backends.postgresql.base import DatabaseWrapper as _DatabaseWrapper
 
 from vinyl.backend_impl import AsyncBackend
-from postgresql_backend.common import PgBackend
+from vinyl.postgresql_backend.common import PgBackend
 
 
 class DatabaseWrapper(AsyncBackend, PgBackend, _DatabaseWrapper):
