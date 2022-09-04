@@ -9,12 +9,12 @@ classifiers = [
     "Topic :: Utilities",
 ]
 
-setup(name="vinyl-async",
+setup(name="vinyl-sync",
       version="0.1.0",
       author="Vitalii Abetkin",
       author_email="abvit89s@gmail.ru",
       packages=find_packages(),
-      description="vinyl-async",
-      long_description="vinyl-async",
+      description="vinyl-sync",
+      long_description="vinyl-sync",
       license="MIT",
       classifiers=classifiers)

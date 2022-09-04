@@ -42,14 +42,10 @@ def replace_file(fpath):
         f.write(text)
 
 
-def main(out_dir=None):
-    #TODO in-place
+def main(out_dir='vinyl_sync/vinyl'):
     pkg = Path(__file__).parent / 'vinyl'
     out_dir = Path(out_dir)
-    if Path(out_dir).exists():
-        # TODO
-        shutil.rmtree(out_dir)
-    shutil.copytree(str(pkg), out_dir)
+    shutil.copytree(str(pkg), out_dir, dirs_exist_ok=True)
     py_files = Path(out_dir).rglob("*.py")
     for fpath in py_files:
         try:
@@ -60,5 +56,4 @@ def main(out_dir=None):
 
 
 if __name__ == '__main__':
-    out_dir = sys.argv[1]
-    main(out_dir)
+    main()
