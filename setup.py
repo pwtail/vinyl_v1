@@ -9,10 +9,7 @@ classifiers = [
     "Topic :: Utilities",
 ]
 
-with open("README.md", "r") as fp:
-    README = fp.read()
-
-setup(name="vinylproject",
+setup(name="vinyl_async",
       version="0.1.0",
       author="Vitalii Abetkin",
       author_email="abvit89s@gmail.ru",

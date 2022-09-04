@@ -1,10 +1,8 @@
 # pragma: I/O specific
-from contextlib import asynccontextmanager, contextmanager
+from contextlib import contextmanager
 from contextvars import ContextVar
 
 from django.db import DEFAULT_DB_ALIAS
-
-from vinyl.backend import Backend
 
 
 @contextmanager
