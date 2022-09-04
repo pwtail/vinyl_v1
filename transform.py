@@ -1,5 +1,5 @@
-import os
 import re
+import shutil
 import sys
 from pathlib import Path
 
@@ -42,8 +42,23 @@ def replace_file(fpath):
         f.write(text)
 
 
-def main(out_dir):
+def main(out_dir=None):
+    #TODO in-place
     pkg = Path(__file__).parent / 'vinyl'
-    pkg = str(pkg.resolve())
-    for root, dirs, files in os.walk(pkg):
-        1
+    out_dir = Path(out_dir)
+    if Path(out_dir).exists():
+        # TODO
+        shutil.rmtree(out_dir)
+    shutil.copytree(str(pkg), out_dir)
+    py_files = Path(out_dir).rglob("*.py")
+    for fpath in py_files:
+        try:
+            replace_file(fpath)
+        except SkipFile:
+            print(f'Skipped: {fpath}')
+            continue
+
+
+if __name__ == '__main__':
+    out_dir = sys.argv[1]
+    main(out_dir)

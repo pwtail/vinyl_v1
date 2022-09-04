@@ -2,7 +2,7 @@ import psycopg_pool
 from django.db.backends.postgresql.base import DatabaseWrapper as _DatabaseWrapper
 
 from vinyl.backend_impl import AsyncBackend
-from vinyl.postgresql_backend.common import PgBackend
+from postgresql_backend.common import PgBackend
 
 
 class DatabaseWrapper(AsyncBackend, PgBackend, _DatabaseWrapper):

@@ -1,10 +1,10 @@
-from contextlib import asynccontextmanager, contextmanager
+from contextlib import asynccontextmanager
 
 import aiomysql
 from django.db.backends.mysql.base import DatabaseWrapper as _DatabaseWrapper
 
 from vinyl.backend_impl import VinylConnectionMixin
-from vinyl.mariadb_backend.ops import DatabaseOperations
+from mariadb_backend.ops import DatabaseOperations
 
 
 class DatabaseWrapper(VinylConnectionMixin, _DatabaseWrapper):

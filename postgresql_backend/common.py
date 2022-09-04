@@ -1,9 +1,9 @@
-from contextlib import contextmanager, asynccontextmanager
+from contextlib import asynccontextmanager
 
 from django.core.exceptions import ImproperlyConfigured
 
 from vinyl.backend import Backend
-from vinyl.postgresql_backend.ops import DatabaseOperations
+from postgresql_backend.ops import DatabaseOperations
 
 
 class PgBackend(Backend):
