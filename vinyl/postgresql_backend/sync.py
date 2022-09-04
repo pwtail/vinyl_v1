@@ -11,5 +11,5 @@ class DatabaseWrapper(SyncBackend, PgBackend, _DatabaseWrapper):
 
     def make_pool(self, dsn):
         return psycopg_pool.ConnectionPool(dsn,
-                                           min_size=1, max_size=1,
+                                           min_size=1, max_size=1, timeout=1,
                                            configure=self.configure_connection)

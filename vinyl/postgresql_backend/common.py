@@ -45,4 +45,5 @@ class PgBackend(Backend):
         if self.pool is None:
             await self.start_pool()
         async with self.pool.connection() as conn:
-            yield conn
+            with self.set_connection(conn):
+                yield conn

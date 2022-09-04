@@ -36,9 +36,8 @@ class Backend:
                 yield self.CursorWrapper(cur)
             return
         async with self.get_connection_from_pool() as conn:
-            with self.set_connection(conn):
-                async with conn.cursor() as cur:
-                    yield self.CursorWrapper(cur)
+            async with conn.cursor() as cur:
+                yield self.CursorWrapper(cur)
 
     def transaction(self):
         if self.connection:
