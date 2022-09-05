@@ -31,7 +31,7 @@ class M(models.Model):
 
 Suppose we are using the sync version of vinyl. `M.objects.all()` will use 
 plain old django, and `M.vinyl.all()` will use vinyl - the results will be 
-the same. If you uncomment the last line, than you will overwrite 
+the same. If you uncomment the last line, than you will override 
 the old implementation.
 
 Vinyl provides its own backends:
