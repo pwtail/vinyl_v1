@@ -98,3 +98,16 @@ the size equal to 1. Because the main logic - the lifetime of a connection,
 when to invalidate one, how to initialize it - is actually the same. For 
 mysql, I actually didn't touch it's sync version and just added the async 
 one (I told you it is supported worse).
+
+**Closing note**
+
+Actually vinyl has all rights to become the next version of django. Because 
+it keeps the compatibility with the latter, provides async functionality, 
+and is developed as a single codebase. It even allows to make changes in a 
+compatible way, being encapsulated in a model manager. It doesn't force user to 
+make his service async-only, allowing for half-sync / half-async applications.
+
+Currently, the sync version has as many bugs as the async one does. And is 
+going to stay that way. There is no rush with it, as you can always use 
+vanilla django for the sync endpoints. However, for the longer perspective - 
+it is exactly what is needed.
