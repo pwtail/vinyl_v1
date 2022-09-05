@@ -115,7 +115,7 @@ one (I told you it is supported worse).
 
 **Closing note**
 
-Actually vinyl has all rights to become the next version of django. Because 
+Actually, vinyl has all rights to become the next version of django. Because 
 it keeps the compatibility with the latter, provides async functionality, 
 and is developed as a single codebase. It even allows to make changes in a 
 compatible way, being encapsulated in a model manager. It doesn't force user to 
