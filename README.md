@@ -23,7 +23,7 @@ functionality remains available. For example:
 ```python
 class M(models.Model):
     vinyl = VinylManager(using='db_with_vinyl_backend')
-    # objects = VinylManager(
+    # objects = VinylManager()
 ```
 
 Suppose we are using the sync version of vinyl. `M.objects.all()` will use 
@@ -60,7 +60,7 @@ await ob.save()
 
 **The changes**
 
-As I said, there are made some deliberate changes. The main one: the lazy 
+As I said, some deliberate changes are made. The main one: the lazy 
 attributes are gone. `obj.related_attr` is always eager, i. e., hits the 
 database. If the attribute has been prefetched and no query is needed, than 
 use `obj['related_attr']`. I think, the explicit approach is better, and 
