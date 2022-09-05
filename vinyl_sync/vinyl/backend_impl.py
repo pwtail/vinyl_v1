@@ -41,6 +41,3 @@ class SyncBackend:
 
     def get_connection(self):
         return self.connection
-
-    def transaction(self):
-        return orig.Atomic(self.alias, savepoint=True, durable=False)
