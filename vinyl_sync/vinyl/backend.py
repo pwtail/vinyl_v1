@@ -48,7 +48,7 @@ class PooledBackend(Backend):
                 yield self.CursorWrapper(cur)
 
     def transaction(self):
-        if self.connection:
+        if self.get_connection() is not None:
             return no_op()
         return self.get_connection_from_pool()
 
