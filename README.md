@@ -72,7 +72,7 @@ use `obj['related_attr']`. I think, the explicit approach is better, and
 also it better fits the async version (in which you should call `await obj.
 related_obj` and `obj['related_obj']` respectively).
 
-Also, you are obliged to use `M.objects.create()` to create instances, `obj.
+Also, you are obliged to use `M.objects.create()` to create instances. `obj.
 save()` should only be used for updates. Actually, I think that allowing to use 
 `save()` 
 for inserts greatly increased complexity for no reason (because you are 
