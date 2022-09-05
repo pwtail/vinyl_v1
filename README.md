@@ -99,8 +99,7 @@ Next, the sync version is actually generated from the async one. I thought
 that, following some rules, the sync version can be obtained by a static 
 tranform. Currently, even that is not required, as the transform is just a 
 simple
-find-and-replace (fff [transform.py](https://github.
-com/vinylproject/vinyl/blob/master/transform.py)).
+find-and-replace ([transform.py](https://github.com/vinylproject/vinyl/blob/master/transform.py)).
 The sync version lives in [vinyl_sync](https://github.com/vinylproject/vinyl/tree/master/vinyl_sync)
 directory.
 
