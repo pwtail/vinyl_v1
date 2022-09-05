@@ -28,7 +28,8 @@ class M(models.Model):
 
 Suppose we are using the sync version of vinyl. `M.objects.all()` will use 
 plain old django, and `M.vinyl.all()` will use vinyl - the results will be 
-the same.
+the same. If you uncomment the last line than you will overwrite 
+the old implementation.
 
 Vinyl provides its own backends:
 
