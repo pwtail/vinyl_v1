@@ -21,7 +21,7 @@ is very close to that of Django, but introduces some changes as well.
 
 The entire functionality of vinyl is encapsulated in a model manager. This 
 makes possible for vinyl to introduce incompatible changes, because the old 
-functionality remains available. For example:
+functionality still remains available. For example:
 
 ```python
 class M(models.Model):
