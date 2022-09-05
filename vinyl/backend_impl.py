@@ -4,6 +4,8 @@ from contextvars import ContextVar
 
 from django.db import DEFAULT_DB_ALIAS
 
+from vinyl.patches import orig
+
 
 @contextmanager
 def no_op():
@@ -26,11 +28,6 @@ class AsyncBackend:
     def get_connection(self):
         return self.connection.get()
 
-    def transaction(self):
-        if self.connection.get():
-            return no_op()
-        return self.get_connection_from_pool()
-
 
 class SyncBackend:
 
@@ -44,3 +41,6 @@ class SyncBackend:
 
     def get_connection(self):
         return self.connection
+
+    def transaction(self):
+        return orig.Atomic(self.alias, savepoint=True, durable=False)

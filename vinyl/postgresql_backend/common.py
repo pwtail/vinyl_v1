@@ -2,11 +2,11 @@ from contextlib import asynccontextmanager
 
 from django.core.exceptions import ImproperlyConfigured
 
-from vinyl.backend import Backend
+from vinyl.backend import PooledBackend
 from vinyl.postgresql_backend.ops import DatabaseOperations
 
 
-class PgBackend(Backend):
+class PgBackend(PooledBackend):
     ops_class = DatabaseOperations
 
     def _to_dsn(self, **kwargs):

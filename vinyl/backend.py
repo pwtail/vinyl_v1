@@ -9,9 +9,7 @@ def no_op():
 
 
 class Backend:
-
     connection = None
-    pool = None
 
     async def execute_sql(self, sql, params):
         """
@@ -28,6 +26,16 @@ class Backend:
         """
         async with self.cursor() as cursor:
             await cursor.execute(sql, params)
+
+    def transaction(self):
+        raise NotImplementedError
+
+    def CursorWrapper(self, cursor):
+        return cursor
+
+
+class PooledBackend(Backend):
+    pool = None
 
     @asynccontextmanager
     async def cursor(self):
@@ -52,6 +60,3 @@ class Backend:
 
     async def start_pool(self):
         raise NotImplementedError
-
-    def CursorWrapper(self, cursor):
-        return cursor
