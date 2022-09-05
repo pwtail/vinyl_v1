@@ -106,7 +106,7 @@ directory.
 A few words about drivers and backends. A vinyl backend provides both sync and 
 async modes. The [psycopg3](https://github.com/psycopg/psycopg) was the 
 simplest to use, as it provides both sync and async API. Even more than that,
-I used the connection pool (psycopg_pool) for the sync version too. The pool 
+I used its connection pool (psycopg_pool) for the sync version too. The pool 
 for that case has 
 the size equal to 1. Because the main logic - the lifetime of a connection, 
 when to invalidate one, how to initialize it - is actually the same. For 
