@@ -69,8 +69,8 @@ As I said, some deliberate changes are made. The main one: the lazy
 attributes are gone. `obj.related_attr` is always eager, i. e., hits the 
 database. If the attribute has been prefetched and no query is needed, than 
 use `obj['related_attr']`. I think, the explicit approach is better, and 
-also it better fits the async version (in which you should call `await obj.
-related_obj` and `obj['related_obj']` respectively).
+also it better fits the async version (in which you should
+call `await obj.related_obj` and `obj['related_obj']` respectively).
 
 Also, you are obliged to use `M.objects.create()` to create instances.
 `obj.save()` should only be used for updates. Actually, I think that allowing to use 
