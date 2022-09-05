@@ -3,13 +3,16 @@ The vinyl project
 *currently at alfa stage*
 
 The purpose of vinyl project is to add the async support to django orm.
-It takes rather radical approach and provides both async and sync versions 
+It takes rather radical approach, providing both async and sync versions 
 at the same time:
 
 ```
 pip install vinyl_async  # to install the async version
 pip install vinyl_sync   # to install the sync one
 ```
+
+The pip commands are shown just for an example, vinyl won't be updated on PyPI 
+very frequently in the nearest future, please use the repository.
 
 The sync and async version mirror each other in terms of the API. The latter 
 is very close to that of Django, but introduces some changes as well.
