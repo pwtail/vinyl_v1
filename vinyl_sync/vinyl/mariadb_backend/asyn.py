@@ -4,12 +4,12 @@ from contextlib import asynccontextmanager
 import aiomysql
 from django.db.backends.mysql.base import DatabaseWrapper as _DatabaseWrapper
 
-from vinyl.backend import Backend
+from vinyl.backend import PooledBackend
 from vinyl.backend_impl import AsyncBackend
 from vinyl.mariadb_backend.ops import DatabaseOperations
 
 
-class DatabaseWrapper(AsyncBackend, Backend, _DatabaseWrapper):
+class DatabaseWrapper(AsyncBackend, PooledBackend, _DatabaseWrapper):
     ops_class = DatabaseOperations
 
     def get_connection_params(self):
