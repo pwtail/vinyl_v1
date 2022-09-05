@@ -103,7 +103,7 @@ find-and-replace ([transform.py](https://github.com/vinylproject/vinyl/blob/mast
 
 One of the key things that make this possible is that you can put 
 parentheses around the awaitable, and can omit them - these have the same 
-meaning, but can be 
+meaning in python, but can be 
 handled differently during the static transform:
 
 ```python
