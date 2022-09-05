@@ -31,7 +31,7 @@ class M(models.Model):
 
 Suppose we are using the sync version of vinyl. `M.objects.all()` will use 
 plain old django, and `M.vinyl.all()` will use vinyl - the results will be 
-the same. If you uncomment the last line than you will overwrite 
+the same. If you uncomment the last line, than you will overwrite 
 the old implementation.
 
 Vinyl provides its own backends:
@@ -47,7 +47,8 @@ DATABASES = {
 }
 ```
 
-Currently postgresql and mysql(mariadb) are supported, the first being 
+Currently postgresql and mysql(mariadb) databases are supported, the first 
+being 
 supported better than the second. More than one provider is needed mainly to 
 correctly define the interface of a backend.
 
