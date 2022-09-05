@@ -7,6 +7,7 @@ And when applied, they turn off transactions and signals
 
 from contextlib import contextmanager
 
+from django.db import DEFAULT_DB_ALIAS
 from django.db.transaction import Atomic
 from django.dispatch import Signal
 
@@ -14,6 +15,12 @@ from django.dispatch import Signal
 @contextmanager
 def no_op():
     yield
+
+DEFAULT_DB_ALIAS
+
+class orig:
+    class Atomic(Atomic):
+        __new__ = Atomic.__new__
 
 
 class AtomicPatch:

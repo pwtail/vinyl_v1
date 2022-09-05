@@ -1,3 +1,4 @@
+# pragma: i/o specific
 from django.db.backends.mysql.operations import DatabaseOperations as _DatabaseOperations
 
 
