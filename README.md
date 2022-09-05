@@ -88,7 +88,9 @@ There are other changes as well:
 
 First of all, not all of django is rewritten. Querysets are lazy and can be 
 made 
-awaitable relatively easy. Then there is a lot of write-only functionality, 
+awaitable relatively easy.
+
+Then, there is a lot of write-only functionality, 
 when you execute statements but don't need to fetch the result. These can be 
 accumulated in a list and then executed at the end, thus removing the need 
 for a rewrite.
