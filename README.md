@@ -84,7 +84,7 @@ There are other changes as well:
 - no chunked fetching
 - autocommit is turned off
 
-**How is this possible?**
+**How is this all possible?**
 
 First of all, not all of django is rewritten. Querysets are lazy and can be 
 made 
