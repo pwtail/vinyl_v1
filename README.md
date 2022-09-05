@@ -100,6 +100,17 @@ that, following some rules, the sync version can be obtained by a static
 tranform. Currently, even that is not required, as the transform is just a 
 simple
 find-and-replace ([transform.py](https://github.com/vinylproject/vinyl/blob/master/transform.py)).
+
+One of the key things that make this possible is that you can put 
+parentheses around the awaitable, and can omit them - these have the same 
+meaning, but can be 
+handled differently during the static transform:
+
+```python
+await(obj)
+await some_method()
+```
+
 The sync version lives in [vinyl_sync](https://github.com/vinylproject/vinyl/tree/master/vinyl_sync)
 directory.
 
