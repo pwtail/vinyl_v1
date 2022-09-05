@@ -1,4 +1,4 @@
-from django.apps import AppConfig
+from django.db import DEFAULT_DB_ALIAS
 from django.db import models
 from django.db.models.manager import BaseManager, ManagerDescriptor
 from django.dispatch import Signal
@@ -23,9 +23,9 @@ class _VinylManager(BaseManager.from_queryset(VinylQuerySet)):
 class VinylManagerDescriptor(ManagerDescriptor):
     manager = None
 
-    def __init__(self):
+    def __init__(self, *, using=DEFAULT_DB_ALIAS):
         self.manager = _VinylManager()
-
+        self.manager._db = using
 
     def __get__(self, instance, owner):
         assert not instance
