@@ -99,9 +99,11 @@ when you execute statements but don't need to fetch the result. These statements
 accumulated in a list and then executed at the end, thus removing the need 
 for a rewrite.
 
-Next, the sync version is actually generated from the async one. I thought 
+**The transpiling**
+
+The sync version is actually generated from the async one. I thought 
 that, following some rules, the sync version can be obtained by a static 
-tranform. Currently, even that is not required, as the transform is just a 
+tranform (thus - the transpiling). Currently, even that is not required, as the transform is just a 
 simple
 find-and-replace ([transform.py](https://github.com/vinylproject/vinyl/blob/master/transform.py)).
 
@@ -118,7 +120,9 @@ await some_method()
 The sync version lives in [vinyl_sync](https://github.com/vinylproject/vinyl/tree/master/vinyl_sync)
 directory.
 
-A few words about drivers and backends. A vinyl backend provides both sync and 
+**Drivers and backends**
+
+A vinyl backend provides both sync and 
 async modes. The [psycopg3](https://github.com/psycopg/psycopg) was the 
 simplest to use, as it provides both sync and async API. Even more than that,
 I used its connection pool (psycopg_pool) for the sync version too. The pool 
