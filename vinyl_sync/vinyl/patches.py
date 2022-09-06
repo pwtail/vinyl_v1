@@ -7,7 +7,6 @@ And when applied, they turn off transactions and signals
 
 from contextlib import contextmanager
 
-from django.db import DEFAULT_DB_ALIAS
 from django.db.transaction import Atomic
 from django.dispatch import Signal
 
@@ -16,7 +15,6 @@ from django.dispatch import Signal
 def no_op():
     yield
 
-DEFAULT_DB_ALIAS
 
 class orig:
     class Atomic(Atomic):
@@ -64,7 +62,7 @@ def apply():
         Signal.send_robust = Signal_send_robust
 
 
-class ModelReadyDescriptor:
+class ModelsReady:
 
     def __get__(self, instance, owner):
         assert instance
@@ -74,8 +72,8 @@ class ModelReadyDescriptor:
         assert instance
         old_val = instance.__dict__.get('models_ready')
         if old_val is False and value is True:
-            from vinyl.manager import init_models
-            init_models.send(Signal)
+            from vinyl.signals import init_models
+            init_models.send(ModelsReady)
         instance.__dict__['models_ready'] = value
 
     def __set_name__(self, owner, name):
@@ -86,6 +84,6 @@ from django.apps import apps
 from django.apps.registry import Apps
 
 class Apps(Apps):
-    models_ready = ModelReadyDescriptor()
+    models_ready = ModelsReady()
 
 apps.__class__ = Apps

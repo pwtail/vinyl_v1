@@ -1,47 +1,29 @@
 from django.db import DEFAULT_DB_ALIAS
-from django.db import models
-from django.db.models.manager import BaseManager, ManagerDescriptor
-from django.dispatch import Signal
+from django.db.models.manager import BaseManager
+from django.dispatch import receiver
 
 from vinyl.meta import make_vinyl_model
 from vinyl.queryset import VinylQuerySet
+from vinyl.signals import init_models
 
-init_models = Signal()
 
-
-class _VinylManager(BaseManager.from_queryset(VinylQuerySet)):
+class VinylManager(BaseManager.from_queryset(VinylQuerySet)):
     """
     VinylManager itself.
     """
     model = None
 
-    def __init__(self, using='vinyl_default'):
+    def __init__(self, *, using=DEFAULT_DB_ALIAS):
         super().__init__()
         self._db = using
 
-
-class VinylManagerDescriptor(ManagerDescriptor):
-    manager = None
-
-    def __init__(self, *, using=DEFAULT_DB_ALIAS):
-        self.manager = _VinylManager()
-        self.manager._db = using
-
-    def __get__(self, instance, owner):
-        assert not instance
-        assert self.manager
-        return self.manager
-
-    def create_model(self, django_model, *args, **kw):
+    def _create_model(self, django_model, *args, **kw):
         self.manager.model = make_vinyl_model(django_model)
 
-    def __set_name__(self, owner, name):
-        assert issubclass(owner, models.Model)
-        self.manager.name = name
-        self.django_model = owner
-        create_model = lambda *args, **kw: self.create_model(owner, *args, **kw)
-        init_models.connect(create_model, sender=Signal)
+    def contribute_to_class(self, owner, name):
+        super().contribute_to_class(owner, name)
 
-
-VinylManager = VinylManagerDescriptor
-
+        @receiver(init_models)
+        def create_model(**kwargs):
+            self.django_model = owner
+            self.model = make_vinyl_model(owner)

@@ -33,4 +33,5 @@ def _copy_namespace(model):
                 from vinyl.descriptors import FKDescriptor
                 val = FKDescriptor(val)
             ns[key] = val
+        # if isinstance(val, Man)
     return ns
