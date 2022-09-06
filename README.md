@@ -63,6 +63,10 @@ await ob.save()
 await ob.delete()
 ```
 
+**How to test**
+
+vinyl should be tested against the "main" branch of django. Currently both sync and async db drivers should be installed, otherwise you will get import errors. The example project (TODO)
+
 **The changes**
 
 As I said, some deliberate changes are made. The main one: the lazy 
