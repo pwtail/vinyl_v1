@@ -1,3 +1,3 @@
 from django.dispatch import Signal
 
-init_models = Signal()
+models_ready = Signal()

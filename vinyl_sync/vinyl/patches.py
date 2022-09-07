@@ -72,8 +72,8 @@ class ModelsReady:
         assert instance
         old_val = instance.__dict__.get('models_ready')
         if old_val is False and value is True:
-            from vinyl.signals import init_models
-            init_models.send(ModelsReady)
+            from vinyl.signals import models_ready as _signal
+            _signal.send(ModelsReady)
         instance.__dict__['models_ready'] = value
 
     def __set_name__(self, owner, name):

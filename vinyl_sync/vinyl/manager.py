@@ -4,7 +4,7 @@ from django.dispatch import receiver
 
 from vinyl.meta import make_vinyl_model
 from vinyl.queryset import VinylQuerySet
-from vinyl.signals import init_models
+from vinyl.signals import models_ready
 
 
 class VinylManager(BaseManager.from_queryset(VinylQuerySet)):
@@ -23,7 +23,7 @@ class VinylManager(BaseManager.from_queryset(VinylQuerySet)):
     def contribute_to_class(self, owner, name):
         super().contribute_to_class(owner, name)
 
-        @receiver(init_models)
+        @receiver(models_ready)
         def create_model(**kwargs):
             self.django_model = owner
             self.model = make_vinyl_model(owner)
