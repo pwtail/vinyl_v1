@@ -46,8 +46,6 @@ class InsertMixin:
     async def insert(self, using=None):
         self._prepare_related_fields_for_save(operation_name="save")
         using = using or router.db_for_write(self.__class__, instance=self)
-        if not using.startswith('vinyl_'):
-            using = f'vinyl_{using}'
         cls = self._deferred_model
         # Skip proxies, but keep the origin as the proxy model.
         if cls._meta.proxy:
