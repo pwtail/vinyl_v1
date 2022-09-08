@@ -7,6 +7,7 @@ And when applied, they turn off transactions and signals
 
 from contextlib import contextmanager
 
+from django.db.models.manager import ManagerDescriptor
 from django.db.transaction import Atomic
 from django.dispatch import Signal
 
@@ -87,3 +88,22 @@ class Apps(Apps):
     models_ready = ModelsReady()
 
 apps.__class__ = Apps
+
+
+class DescriptorPatch:
+    orig = ManagerDescriptor.__get__
+
+    @classmethod
+    def apply(cls):
+        ManagerDescriptor.__get__ = cls.__get__
+
+    def __get__(self, instance, cls):
+        mgr = DescriptorPatch.orig(self, instance, cls)
+        from vinyl.queryset import VinylQuerySet
+        if issubclass(mgr._queryset_class, VinylQuerySet):
+            return mgr
+        from vinyl.meta import make_vinyl_model
+        mgr.model = make_vinyl_model(mgr.model)
+        mgr_class = mgr.from_queryset(VinylQuerySet)
+        mgr.__class__ = mgr_class
+        return mgr

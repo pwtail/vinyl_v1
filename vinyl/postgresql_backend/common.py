@@ -1,5 +1,7 @@
 from contextlib import asynccontextmanager
+from functools import cached_property
 
+import psycopg
 from django.core.exceptions import ImproperlyConfigured
 
 from vinyl.backend import PooledBackend
@@ -47,3 +49,15 @@ class PgBackend(PooledBackend):
         async with self.pool.connection() as conn:
             with self.set_connection(conn):
                 yield conn
+
+    @cached_property
+    def pg_version(self):
+        return psycopg.pq.version()
+
+    @asynccontextmanager
+    def _nodb_cursor(self):
+        conn_params = self.get_connection_params()
+        dsn = self._to_dsn(**conn_params)
+        async with psycopg.connect(dsn, autocommit=True) as conn:
+            async with conn.cursor() as cursor:
+                yield cursor

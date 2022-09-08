@@ -25,5 +25,4 @@ class VinylManager(BaseManager.from_queryset(VinylQuerySet)):
 
         @receiver(models_ready)
         def create_model(**kwargs):
-            self.django_model = owner
             self.model = make_vinyl_model(owner)

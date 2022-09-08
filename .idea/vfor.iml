@@ -5,7 +5,7 @@
       <excludeFolder url="file://$MODULE_DIR$/build" />
       <excludeFolder url="file://$MODULE_DIR$/vinyl_sync" />
     </content>
-    <orderEntry type="jdk" jdkName="Pipenv (vinyl)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.10 (vinyl-JttTIJfk)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

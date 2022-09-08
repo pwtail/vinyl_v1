@@ -3,8 +3,8 @@ from django.db.models import QuerySet, Model
 from django.db.models.query import MAX_GET_RESULTS
 from django.db.models.utils import resolve_callables
 
-from vinyl.deferred import deferred
 from vinyl import iterables
+from vinyl.deferred import deferred
 from vinyl.flags import is_async
 from vinyl.prefetch import prefetch_related_objects
 from vinyl.query import VinylQuery
@@ -79,6 +79,12 @@ class VinylQuerySet(QuerySet):
 
     def __aiter__(self):
         return self._aiter()
+
+    if is_async():
+        def __iter__(self):
+            yield from self._result_cache
+    else:
+        __iter__ = __aiter__
 
     async def _aiter(self):
         await(self)
