@@ -45,4 +45,4 @@ custom modelbase
 
 compatibility of backends
 
-change: ManDescriptor.__get__
+fallback to old backend if ctx flag is not set
