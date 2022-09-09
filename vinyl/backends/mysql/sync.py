@@ -2,10 +2,9 @@
 
 from django.db.backends.mysql.base import DatabaseWrapper as _DatabaseWrapper
 
-from vinyl.backend import Backend
-from vinyl.backend_impl import SyncBackend
-
-from vinyl.mariadb_backend.ops import DatabaseOperations
+from vinyl.backends.backend import Backend
+from vinyl.backends.backend_impl import SyncBackend
+from vinyl.backends.mysql.ops import DatabaseOperations
 from vinyl.patches import orig
 
 

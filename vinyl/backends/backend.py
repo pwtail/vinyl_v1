@@ -1,6 +1,5 @@
 from contextlib import asynccontextmanager, contextmanager
-
-from vinyl.flags import is_async
+from functools import cached_property
 
 
 @contextmanager
@@ -32,6 +31,16 @@ class Backend:
 
     def CursorWrapper(self, cursor):
         return cursor
+
+    @cached_property
+    def ops(self):
+        return self.ops_class(self)
+
+    def __init__(self, *args, **kw):
+        self._fallback = self.fallback_class(*args, **kw)
+
+    def __getattr__(self, name):
+        return getattr(self._fallback, name)
 
 
 class PooledBackend(Backend):

@@ -4,9 +4,9 @@ from contextlib import asynccontextmanager
 import aiomysql
 from django.db.backends.mysql.base import DatabaseWrapper as _DatabaseWrapper
 
-from vinyl.backend import PooledBackend
-from vinyl.backend_impl import AsyncBackend
-from vinyl.mariadb_backend.ops import DatabaseOperations
+from vinyl.backends.backend import PooledBackend
+from vinyl.backends.backend_impl import AsyncBackend
+from vinyl.backends.mysql.ops import DatabaseOperations
 
 
 class DatabaseWrapper(AsyncBackend, PooledBackend, _DatabaseWrapper):

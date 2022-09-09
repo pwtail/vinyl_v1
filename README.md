@@ -37,7 +37,7 @@ Vinyl provides its own backends:
 ```python
 DATABASES = {
     'vinyl_db': {
-        'ENGINE': 'vinyl.postgresql_backend',
+        'ENGINE': 'vinyl.postgresql',
         'PASSWORD': 'postgres',
         'USER': 'postgres',
         'NAME': 'mydb',

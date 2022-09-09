@@ -4,8 +4,6 @@ from contextvars import ContextVar
 
 from django.db import DEFAULT_DB_ALIAS
 
-from vinyl.patches import orig
-
 
 @contextmanager
 def no_op():
@@ -29,6 +27,7 @@ class AsyncBackend:
         return self.connection.get()
 
 
+# TODO sync conn
 class SyncBackend:
 
     @contextmanager
