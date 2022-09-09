@@ -90,14 +90,13 @@ class Apps(Apps):
 
 
 class DescriptorPatch:
-    orig = ManagerDescriptor.__get__
 
     @classmethod
     def apply(cls):
         ManagerDescriptor.__get__ = cls.__get__
 
-    def __get__(self, instance, cls):
-        mgr = DescriptorPatch.orig(self, instance, cls)
+    def __get__(self, instance, cls, __get__=ManagerDescriptor.__get__):
+        mgr = __get__(self, instance, cls)
         from vinyl.queryset import VinylQuerySet
         if issubclass(mgr._queryset_class, VinylQuerySet):
             return mgr
