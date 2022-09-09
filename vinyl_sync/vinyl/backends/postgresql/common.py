@@ -1,7 +1,7 @@
 from contextlib import contextmanager
 from functools import cached_property
 
-import django.db.backends.postgresql
+import django.db.backends.postgresql.base
 import psycopg
 from django.core.exceptions import ImproperlyConfigured
 

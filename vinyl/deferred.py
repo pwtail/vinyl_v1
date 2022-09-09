@@ -1,10 +1,10 @@
 import threading
 from contextlib import asynccontextmanager, contextmanager
-from contextvars import ContextVar
 
 from django.db import connections
 
 from vinyl import patches
+from vinyl.flags import use_vinyl
 
 
 class StatementsList(list):
@@ -41,6 +41,7 @@ def is_collecting_sql():
 
 @asynccontextmanager
 async def deferred():
-    with collect_sql() as items:
-        yield
-    await execute_statements(items)
+    async with use_vinyl():
+        with collect_sql() as items:
+            yield
+        await execute_statements(items)

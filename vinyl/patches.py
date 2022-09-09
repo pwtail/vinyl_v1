@@ -9,6 +9,7 @@ from contextlib import contextmanager
 
 from django.db.models.manager import ManagerDescriptor
 from django.db.transaction import Atomic
+from django.db.utils import ConnectionHandler
 from django.dispatch import Signal
 
 
@@ -87,8 +88,6 @@ from django.apps.registry import Apps
 class Apps(Apps):
     models_ready = ModelsReady()
 
-apps.__class__ = Apps
-
 
 class DescriptorPatch:
     orig = ManagerDescriptor.__get__
@@ -107,3 +106,24 @@ class DescriptorPatch:
         mgr_class = mgr.from_queryset(VinylQuerySet)
         mgr.__class__ = mgr_class
         return mgr
+
+
+class ConnectionHandlerPatch:
+
+    @classmethod
+    def apply(cls):
+        ConnectionHandler.__getitem__ = cls.__getitem__
+
+    def __getitem__(ch, alias,
+                    __getitem__=ConnectionHandler.__getitem__):
+        conn = __getitem__(ch, alias)
+        from vinyl.flags import is_vinyl
+        if is_vinyl.get():
+            return conn
+        return conn._fallback
+
+
+# APPLY:
+
+apps.__class__ = Apps
+ConnectionHandlerPatch.apply()

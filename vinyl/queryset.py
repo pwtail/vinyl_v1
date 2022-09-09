@@ -5,7 +5,7 @@ from django.db.models.utils import resolve_callables
 
 from vinyl import iterables
 from vinyl.deferred import deferred
-from vinyl.flags import is_async
+from vinyl.flags import is_async, use_vinyl
 from vinyl.prefetch import prefetch_related_objects
 from vinyl.query import VinylQuery
 
@@ -91,6 +91,7 @@ class VinylQuerySet(QuerySet):
         for item in self._result_cache:
             yield item
 
+    @use_vinyl()
     async def __Await__(self):
         if self._result_cache is None:
             iterable_class = getattr(iterables, self._iterable_class.__name__)

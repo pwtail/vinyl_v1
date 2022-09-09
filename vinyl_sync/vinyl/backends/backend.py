@@ -1,5 +1,4 @@
 from contextlib import contextmanager, contextmanager
-from functools import cached_property
 
 
 @contextmanager
@@ -9,6 +8,10 @@ def no_op():
 
 class Backend:
     connection = None
+
+    def __init__(self, *args, **kw):
+        super().__init__(*args, **kw)
+        self._fallback = self.fallback_class(*args, **kw)
 
     def execute_sql(self, sql, params):
         """
@@ -31,16 +34,6 @@ class Backend:
 
     def CursorWrapper(self, cursor):
         return cursor
-
-    @cached_property
-    def ops(self):
-        return self.ops_class(self)
-
-    def __init__(self, *args, **kw):
-        self._fallback = self.fallback_class(*args, **kw)
-
-    def __getattr__(self, name):
-        return getattr(self._fallback, name)
 
 
 class PooledBackend(Backend):

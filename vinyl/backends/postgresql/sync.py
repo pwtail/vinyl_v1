@@ -1,12 +1,13 @@
 # pragma: i/o specific
 
 import psycopg_pool
+from django.db.backends.postgresql.base import DatabaseWrapper as _DatabaseWrapper
 
 from vinyl.backends.backend_impl import SyncBackend
 from vinyl.backends.postgresql.common import PgBackend
 
 
-class DatabaseWrapper(SyncBackend, PgBackend):
+class DatabaseWrapper(SyncBackend, PgBackend, _DatabaseWrapper):
 
     def make_pool(self, dsn):
         return psycopg_pool.ConnectionPool(dsn,
