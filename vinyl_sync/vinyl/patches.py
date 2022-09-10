@@ -59,7 +59,10 @@ def apply():
         Signal.send_robust = SignalPatch.send_robust
         yield
     finally:
-        Atomic.__new__ = Atomic__new__
+        if Atomic__new__ is not object.__new__:
+            Atomic.__new__ = Atomic__new__
+        else:
+            del Atomic.__new__
         Signal.send = Signal_send
         Signal.send_robust = Signal_send_robust
 
@@ -90,6 +93,7 @@ class Apps(Apps):
 
 
 class DescriptorPatch:
+    # used for testing
 
     @classmethod
     def apply(cls):
