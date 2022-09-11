@@ -47,22 +47,20 @@ class SignalPatch:
         return Signal.send_robust(*args, **kwargs)
 
 
-
 @contextmanager
 def apply():
-    Atomic__new__ = Atomic.__new__
+    Atomic__enter__ = Atomic.__enter__
+    Atomic__exit__ = Atomic.__exit__
     Signal_send = Signal.send
     Signal_send_robust = Signal.send_robust
     try:
-        Atomic.__new__ = AtomicPatch.__new__
+        Atomic.__enter__ = Atomic.__exit__ = lambda *args, **kw: None
         Signal.send = SignalPatch.send
         Signal.send_robust = SignalPatch.send_robust
         yield
     finally:
-        if Atomic__new__ is not object.__new__:
-            Atomic.__new__ = Atomic__new__
-        else:
-            del Atomic.__new__
+        Atomic.__enter__ = Atomic__enter__
+        Atomic.__exit__ = Atomic__exit__
         Signal.send = Signal_send
         Signal.send_robust = Signal_send_robust
 
