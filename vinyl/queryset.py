@@ -186,6 +186,5 @@ class VinylQuerySet(QuerySet):
         and returning the created object.
         """
         obj = self.model(**kwargs)
-        self._for_write = True
-        await obj.insert(using=self.db)
+        await obj.save(force_insert=True, using=self._db)
         return obj
