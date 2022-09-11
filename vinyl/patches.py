@@ -20,7 +20,8 @@ def no_op():
 
 class orig:
     class Atomic(Atomic):
-        __new__ = Atomic.__new__
+        __enter__ = Atomic.__enter__
+        __exit__ = Atomic.__exit__
 
 
 class AtomicPatch:
