@@ -24,26 +24,18 @@ class orig:
         __exit__ = Atomic.__exit__
 
 
-class AtomicPatch:
-
-    def __new__(cls, *args, **kwargs):
-        from vinyl.deferred import is_collecting_sql
-        if is_collecting_sql():
-            return no_op()
-        return super().__new__(cls)
-
-
 class SignalPatch:
 
     def send(*args, **kwargs):
-        from vinyl.deferred import is_collecting_sql
-        if is_collecting_sql():
+        from vinyl.flags import is_vinyl
+        #TODO only for async
+        if is_vinyl.get():
             return
         return Signal.send(*args, **kwargs)
 
     def send_robust(*args, **kwargs):
-        from vinyl.deferred import is_collecting_sql
-        if is_collecting_sql():
+        from vinyl.flags import is_vinyl
+        if is_vinyl.get():
             return
         return Signal.send_robust(*args, **kwargs)
 
@@ -52,18 +44,18 @@ class SignalPatch:
 def apply():
     Atomic__enter__ = Atomic.__enter__
     Atomic__exit__ = Atomic.__exit__
-    Signal_send = Signal.send
-    Signal_send_robust = Signal.send_robust
+    # Signal_send = Signal.send
+    # Signal_send_robust = Signal.send_robust
     try:
         Atomic.__enter__ = Atomic.__exit__ = lambda *args, **kw: None
-        Signal.send = SignalPatch.send
-        Signal.send_robust = SignalPatch.send_robust
+        # Signal.send = SignalPatch.send
+        # Signal.send_robust = SignalPatch.send_robust
         yield
     finally:
         Atomic.__enter__ = Atomic__enter__
         Atomic.__exit__ = Atomic__exit__
-        Signal.send = Signal_send
-        Signal.send_robust = Signal_send_robust
+        # Signal.send = Signal_send
+        # Signal.send_robust = Signal_send_robust
 
 
 class ModelsReady:
@@ -78,6 +70,7 @@ class ModelsReady:
         if old_val is False and value is True:
             from vinyl.signals import models_ready as _signal
             _signal.send(ModelsReady)
+            print('models_ready')
         instance.__dict__['models_ready'] = value
 
     def __set_name__(self, owner, name):
@@ -128,4 +121,4 @@ class ConnectionHandlerPatch:
 # APPLY:
 
 apps.__class__ = Apps
-ConnectionHandlerPatch.apply()
+# ConnectionHandlerPatch.apply()

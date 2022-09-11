@@ -50,3 +50,5 @@ check that when flag is set fallback is not used
 nuke threadlocal
 
 change _save_parents (turn to gen) & save_base
+
+keep signals
