@@ -10,7 +10,6 @@ from contextlib import contextmanager
 from django.db.models.manager import ManagerDescriptor
 from django.db.transaction import Atomic
 from django.db.utils import ConnectionHandler
-from django.dispatch import Signal
 
 
 @contextmanager
@@ -23,22 +22,22 @@ class orig:
         __enter__ = Atomic.__enter__
         __exit__ = Atomic.__exit__
 
-
-class SignalPatch:
-
-    def send(*args, **kwargs):
-        from vinyl.flags import is_vinyl
-        #TODO only for async
-        if is_vinyl.get():
-            return
-        return Signal.send(*args, **kwargs)
-
-    def send_robust(*args, **kwargs):
-        from vinyl.flags import is_vinyl
-        if is_vinyl.get():
-            return
-        return Signal.send_robust(*args, **kwargs)
-
+#
+# class SignalPatch:
+#
+#     def send(*args, **kwargs):
+#         from vinyl.flags import is_vinyl
+#         #TODO only for async
+#         if is_vinyl.get():
+#             return
+#         return Signal.send(*args, **kwargs)
+#
+#     def send_robust(*args, **kwargs):
+#         from vinyl.flags import is_vinyl
+#         if is_vinyl.get():
+#             return
+#         return Signal.send_robust(*args, **kwargs)
+#
 
 @contextmanager
 def apply():
@@ -80,8 +79,10 @@ class ModelsReady:
 from django.apps import apps
 from django.apps.registry import Apps
 
+
 class Apps(Apps):
     models_ready = ModelsReady()
+
 
 
 class DescriptorPatch:
@@ -122,3 +123,4 @@ class ConnectionHandlerPatch:
 
 apps.__class__ = Apps
 # ConnectionHandlerPatch.apply()
+# SignalPatch.apply()

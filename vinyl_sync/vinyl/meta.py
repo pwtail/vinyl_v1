@@ -1,6 +1,6 @@
 from django.db.models.query_utils import DeferredAttribute
 
-from vinyl.model import VinylModel, SkipModelBase
+from vinyl.model import VinylModel
 
 
 def make_vinyl_model(model):
@@ -8,7 +8,7 @@ def make_vinyl_model(model):
         return model.vinyl_model
     ns = _copy_namespace(model)
     newcls = model.vinyl_model = type(model.__name__, (VinylModel, model), ns)
-    newcls._deferred_model = SkipModelBase(model.__name__, (model,), {})
+    newcls._deferred_model = model
     return newcls
 
 

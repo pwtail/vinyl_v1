@@ -1,5 +1,8 @@
 from contextlib import contextmanager
 
+import django
+from django.apps import apps
+from django.db import DJANGO_VERSION_PICKLE_KEY
 from django.db.models import Model
 from django.db.models.base import ModelBase
 
@@ -69,3 +72,16 @@ class VinylModel(InsertMixin, SaveModel, DeferredModel, metaclass=SkipModelBase)
     def delete(self, using=None, keep_parents=False):
         with self._deferred():
             Model.delete(self, using=using, keep_parents=keep_parents)
+
+    def __reduce__(self):
+        data = self.__getstate__()
+        data[DJANGO_VERSION_PICKLE_KEY] = django.__version__
+        class_id = self._meta.app_label, self._meta.object_name
+        return model_unpickle_vinyl, (class_id,), data
+
+
+def model_unpickle_vinyl(model_id):
+    assert isinstance(model_id, tuple)
+    model = apps.get_model(*model_id)
+    model = model.vinyl_model
+    return model.__new__(model)
