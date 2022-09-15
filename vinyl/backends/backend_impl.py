@@ -13,18 +13,18 @@ def no_op():
 class AsyncBackend:
     def __init__(self, settings_dict, alias=DEFAULT_DB_ALIAS):
         super().__init__(settings_dict, alias)
-        self.connection = ContextVar('async_connection', default=None)
+        self.conn = ContextVar('async_connection', default=None)
 
     @contextmanager
     def set_connection(self, conn):
-        _token = self.connection.set(conn)
+        _token = self.conn.set(conn)
         try:
             yield
         finally:
-            self.connection.set(None)
+            self.conn.set(None)
 
     def get_connection(self):
-        return self.connection.get()
+        return self.conn.get()
 
 
 # TODO sync conn
@@ -32,11 +32,14 @@ class SyncBackend:
 
     @contextmanager
     def set_connection(self, conn):
-        self.connection = conn
+        self.conn = conn
         try:
             yield
         finally:
-            self.connection = None
+            self.conn = None
 
     def get_connection(self):
-        return self.connection
+        return self.conn
+
+from django.test.testcases import TransactionTestCase
+TransactionTestCase

@@ -1,4 +1,3 @@
-from django.db import connections
 from django.db.utils import load_backend
 
 backends = {}
@@ -15,10 +14,14 @@ try:
 except:
     pass
 
+#BUGG
 
-def replace_DATABASES(dic):
+def _DATABASES(dic):
+    # dic = settings.DATABASES
     for key, item in tuple(dic.items()):
         backend = load_backend(item['ENGINE'])
         if new_backend := backends.get(backend):
-            item['ENGINE'] = new_backend
-            del connections[key]
+            dic[f'vinyl_{key}'] = (new_item := dict(item))
+            new_item['ENGINE'] = new_backend
+
+    return dic

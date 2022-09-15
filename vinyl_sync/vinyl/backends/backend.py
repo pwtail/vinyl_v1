@@ -7,11 +7,7 @@ def no_op():
 
 
 class Backend:
-    connection = None
-
-    def __init__(self, *args, **kw):
-        super().__init__(*args, **kw)
-        self._fallback = self.fallback_class(*args, **kw)
+    conn = None
 
     def execute_sql(self, sql, params):
         """

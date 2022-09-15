@@ -7,6 +7,7 @@ And when applied, they turn off transactions and signals
 
 from contextlib import contextmanager
 
+from django.db import connection
 from django.db.models.manager import ManagerDescriptor
 from django.db.transaction import Atomic
 from django.db.utils import ConnectionHandler
@@ -118,9 +119,65 @@ class ConnectionHandlerPatch:
             return conn
         return conn._fallback
 
+# from django.test.testcases import TestCase
+#
+# class TestCasePatch:
+#
+#     def _post_teardown(self, *, _post_teardown=TestCase._post_teardown):
+#         restore_DATABASES()
+#         return _post_teardown(self)
+#
+#     def _pre_setup(self, *, _pre_setup=TestCase._pre_setup):
+#         ret = _pre_setup(self)
+#         replace_DATABASES()
+#
+#         for app_name, app in apps.app_configs.items():
+#             for model_name, model in app.models.items():
+#                 mgr = model.objects
+#                 from vinyl.queryset import VinylQuerySet
+#                 if issubclass(mgr._queryset_class, VinylQuerySet):
+#                     continue
+#                 from vinyl.meta import make_vinyl_model
+#                 mgr.model = make_vinyl_model(mgr.model)
+#                 mgr_class = mgr.from_queryset(VinylQuerySet)
+#                 mgr.__class__ = mgr_class
+#
+#         return ret
 
-# APPLY:
 
-apps.__class__ = Apps
-# ConnectionHandlerPatch.apply()
-# SignalPatch.apply()
+def patch_manager():
+    #TODO just change .manager in descriptor
+    for app_name, app in apps.app_configs.items():
+        for model_name, model in app.models.items():
+            mgr = model.objects
+            from vinyl.queryset import VinylQuerySet
+            if issubclass(mgr._queryset_class, VinylQuerySet):
+                continue
+            from vinyl.meta import make_vinyl_model
+            mgr.model = make_vinyl_model(mgr.model)
+            mgr._db = f'vinyl_{mgr._db}'
+            mgr_class = mgr.from_queryset(VinylQuerySet)
+            mgr.__class__ = mgr_class
+
+
+from django.test.testcases import TransactionTestCase
+
+
+class TransactionalTestCasePatch:
+
+    # @in_transaction()
+    def run(self, result=None, run=TransactionTestCase.run):
+        patch_manager()
+        run(self, result)
+        connection.close()
+
+TransactionTestCase.run = TransactionalTestCasePatch.run
+
+
+# class C:1
+#
+# @patch.apply
+# class C(C, metaclass=patch):
+#
+#     def f(self, f=C.f):
+#         f()

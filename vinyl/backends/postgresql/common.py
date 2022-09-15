@@ -56,10 +56,15 @@ class PgBackend(PooledBackend):
     def pg_version(self):
         return psycopg.pq.version()
 
-    @asynccontextmanager
-    def _nodb_cursor(self):
-        conn_params = self.get_connection_params()
-        dsn = self._to_dsn(**conn_params)
-        async with psycopg.connect(dsn, autocommit=True) as conn:
-            async with conn.cursor() as cursor:
-                yield cursor
+    # @asynccontextmanager
+    # def _nodb_cursor(self):
+    #     nodb = self.__class__({**self.settings_dict, "NAME": None}, alias=NO_DB_ALIAS)
+    #     conn_params = nodb.get_connection_params()
+    #     dsn = nodb._to_dsn(**conn_params)
+    #     async with psycopg.connect(dsn, autocommit=True) as conn:
+    #         async with conn.cursor() as cursor:
+    #             yield cursor
+
+    async def close(self):
+        if self.pool:
+            await self.pool.close()
