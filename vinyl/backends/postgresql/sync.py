@@ -5,9 +5,10 @@ from django.db.backends.postgresql.base import DatabaseWrapper as _DatabaseWrapp
 
 from vinyl.backends.backend_impl import SyncBackend
 from vinyl.backends.postgresql.common import PgBackend
+from vinyl.backends.postgresql.restrictions import Restrictions
 
 
-class DatabaseWrapper(SyncBackend, PgBackend, _DatabaseWrapper):
+class DatabaseWrapper(Restrictions, SyncBackend, PgBackend, _DatabaseWrapper):
 
     def make_pool(self, dsn):
         return psycopg_pool.ConnectionPool(dsn,

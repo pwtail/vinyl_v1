@@ -85,6 +85,8 @@ class Apps(Apps):
     models_ready = ModelsReady()
 
 
+apps.__class__ = Apps
+
 
 class DescriptorPatch:
     # used for testing
