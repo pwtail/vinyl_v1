@@ -3,12 +3,12 @@ from django.db.models import NOT_PROVIDED, ExpressionWrapper, Max, Value, Intege
 from django.db.models.functions import Coalesce
 from django.db.models.signals import pre_save, post_save
 
-from vinyl.flags import use_vinyl
+from vinyl import patches
 
 
 class SaveModel:
 
-    @use_vinyl()
+    @patches.apply()
     def save(
         self, force_insert=False, force_update=False, using=None, update_fields=None
     ):

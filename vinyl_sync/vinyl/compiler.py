@@ -76,7 +76,7 @@ class DeferredCompilerMixin(StatementsMixin):
         self.add_statement(sql, params)
 
 
-class SQLUpdateCompiler(DeferredCompilerMixin, _compiler.SQLUpdateCompiler):
+class SQLUpdateCompiler(_compiler.SQLUpdateCompiler):
     pass
 
 
