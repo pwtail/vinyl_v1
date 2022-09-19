@@ -1,5 +1,5 @@
-The vinyl project
----------------
+The vinyl project (WIP)
+----------------------
 
 It is an ongoing work to make django orm async. There is already v1 version of vinyl that proved
 itself working and useful. v2 will take even more radical approach (the details will be later).
